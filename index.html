@@ -2,45 +2,58 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>手機租借預約表單</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: "Helvetica Neue", sans-serif;
+      padding: 30px;
+      background-color: #fff;
       max-width: 600px;
-      margin: 40px auto;
-      padding: 20px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
     }
     label {
       display: block;
-      margin-top: 20px;
       font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 6px;
     }
-    input, select, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 10px;
       font-size: 16px;
-      margin-top: 5px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
       box-sizing: border-box;
     }
     .checkbox-group {
       display: flex;
       align-items: center;
       margin-top: 20px;
+      font-weight: bold;
     }
-    .checkbox-group input {
-      width: auto;
+    .checkbox-group input[type="checkbox"] {
       margin-right: 10px;
+      transform: scale(1.2);
     }
     button {
-      width: 100%;
-      margin-top: 30px;
+      background-color: #222;
+      color: #fff;
       padding: 12px;
-      font-size: 18px;
-      background-color: #000;
-      color: white;
       border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      width: 100%;
       cursor: pointer;
+    }
+    button:hover {
+      background-color: #444;
     }
   </style>
 </head>
@@ -49,13 +62,13 @@
 
   <form>
     <label for="name">姓名</label>
-    <input type="text" id="name" name="name" placeholder="請輸入姓名" required />
+    <input type="text" id="name" name="name" required />
 
     <label for="phone">聯絡電話</label>
-    <input type="tel" id="phone" name="phone" placeholder="請輸入電話號碼" required />
+    <input type="tel" id="phone" name="phone" required />
 
-    <label for="start">租借開始日期</label>
-    <input type="date" id="start" name="start" required />
+    <label for="date">租借日期（起始日）</label>
+    <input type="date" id="date" name="date" required />
 
     <label for="days">租借天數</label>
     <select id="days" name="days" required>
@@ -67,7 +80,7 @@
       <option value="5">5 天以上</option>
     </select>
 
-    <label for="model">手機型號</label>
+    <label for="model">租借設備</label>
     <select id="model" name="model">
       <option>S23 Ultra 墨竹綠</option>
     </select>
@@ -78,20 +91,19 @@
     </div>
 
     <label for="contact">IG帳號 或 LINE ID</label>
-    <input type="text" id="contact" name="contact" placeholder="@your_ig 或 line_id" />
+    <input type="text" id="contact" name="contact" placeholder="@your_ig 或 line_id" required />
 
-    <label for="location">預計取機地點</label>
-    <select id="location" name="location">
+    <label for="pickup">預計取機地點</label>
+    <select id="pickup" name="pickup" required>
       <option>弘大</option>
       <option>新村</option>
       <option>合井</option>
       <option>望遠</option>
       <option>永登浦周邊</option>
-      <option>其他（請備註說明）</option>
     </select>
 
     <label for="note">備註</label>
-    <textarea id="note" name="note" rows="4" placeholder="如有特殊需求請備註"></textarea>
+    <textarea id="note" name="note" placeholder="如有特殊需求請備註"></textarea>
 
     <div class="checkbox-group">
       <input type="checkbox" id="agree" name="agree" required />
@@ -102,3 +114,4 @@
   </form>
 </body>
 </html>
+
