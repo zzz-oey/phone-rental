@@ -1,93 +1,32 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>手機租借預約表單</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        max-width: 600px;
-        margin: 40px auto;
-        padding: 20px;
-      }
-      label {
-        display: block;
-        margin-top: 20px;
-        font-weight: bold;
-      }
-      input, select, textarea {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        margin-top: 5px;
-      }
-      button {
-        width: 100%;
-        margin-top: 30px;
-        padding: 12px;
-        font-size: 18px;
-        background-color: #000;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>📱 手機租借預約</h1>
-
-    <label>姓名</label>
-    <input type="text" id="name" placeholder="請輸入姓名" />
-
-    <label>聯絡電話</label>
-    <input type="text" id="phone" placeholder="請輸入電話" />
-
-    <label>租借日期（起）</label>
-    <input type="date" id="startDate" />
-
-    <label>租借日期（迄）</label>
-    <input type="date" id="endDate" />
-
-    <label>手機型號</label>
-    <select id="model">
-      <option value="S23 Ultra 墨竹綠">S23 Ultra 墨竹綠</option>
-    </select>
-
-    <label>
-      <input type="checkbox" id="charger" />
-      是否需要 Type-C 充電頭
-    </label>
-
-    <label>IG帳號 或 LINE ID</label>
-    <input type="text" id="social" placeholder="@your_ig 或 line_id" />
-
-    <label>預計取機地點</label>
-    <select id="location">
-      <option value="弘大">弘大</option>
-      <option value="新村">新村</option>
-      <option value="合井">合井</option>
-      <option value="望遠">望遠</option>
-      <option value="永登浦周邊地鐵站">永登浦周邊地鐵站</option>
-      <option value="其他">其他（請於備註說明）</option>
-    </select>
-
-    <label>備註</label>
-    <textarea id="note" rows="3" placeholder="如有特殊需求請備註"></textarea>
-
-    <label>
-      <input type="checkbox" id="agree" />
-      我已閱讀並同意租借規則
-    </label>
-
-    <button onclick="submitForm()">送出預約</button>
-
-    <p id="result" style="margin-top: 20px; font-weight: bold;"></p>
-
-    <script>
-      function submitForm() {
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const start = document.getElementById('startDate').value;
-        const end = document.getElementById('endDate').value;
-        const model = document.getElementById('model').
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>手機租借預約表單</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .checkbox-group input {
+      w
