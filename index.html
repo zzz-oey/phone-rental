@@ -29,4 +29,76 @@
       margin-top: 20px;
     }
     .checkbox-group input {
-      w
+      width: auto;
+      margin-right: 10px;
+    }
+    button {
+      width: 100%;
+      margin-top: 30px;
+      padding: 12px;
+      font-size: 18px;
+      background-color: #000;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>手機租借預約表單</h1>
+
+  <form>
+    <label for="name">姓名</label>
+    <input type="text" id="name" name="name" placeholder="請輸入姓名" required />
+
+    <label for="phone">聯絡電話</label>
+    <input type="tel" id="phone" name="phone" placeholder="請輸入電話號碼" required />
+
+    <label for="start">租借開始日期</label>
+    <input type="date" id="start" name="start" required />
+
+    <label for="days">租借天數</label>
+    <select id="days" name="days" required>
+      <option value="">請選擇</option>
+      <option value="1">1 天</option>
+      <option value="2">2 天</option>
+      <option value="3">3 天</option>
+      <option value="4">4 天</option>
+      <option value="5">5 天以上</option>
+    </select>
+
+    <label for="model">手機型號</label>
+    <select id="model" name="model">
+      <option>S23 Ultra 墨竹綠</option>
+    </select>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="charger" name="charger" />
+      <label for="charger">是否需要 Type-C 充電頭</label>
+    </div>
+
+    <label for="contact">IG帳號 或 LINE ID</label>
+    <input type="text" id="contact" name="contact" placeholder="@your_ig 或 line_id" />
+
+    <label for="location">預計取機地點</label>
+    <select id="location" name="location">
+      <option>弘大</option>
+      <option>新村</option>
+      <option>合井</option>
+      <option>望遠</option>
+      <option>永登浦周邊</option>
+      <option>其他（請備註說明）</option>
+    </select>
+
+    <label for="note">備註</label>
+    <textarea id="note" name="note" rows="4" placeholder="如有特殊需求請備註"></textarea>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="agree" name="agree" required />
+      <label for="agree">我已閱讀並同意租借規則</label>
+    </div>
+
+    <button type="submit">送出預約</button>
+  </form>
+</body>
+</html>
