@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>手機租借預約</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      input, button {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 10px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📱 手機租借預約</h1>
+
+    <label>姓名</label>
+    <input type="text" id="name" placeholder="請輸入姓名" />
+
+    <label>聯絡電話</label>
+    <input type="text" id="phone" placeholder="請輸入電話號碼" />
+
+    <button onclick="submitForm()">送出預約</button>
+
+    <p id="result" style="margin-top:20px; font-weight: bold;"></p>
+
+    <script>
+      function submitForm() {
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const result = document.getElementById('result');
+
+        if (!name || !phone) {
+          result.innerText = '❗️請填寫完整資訊';
+        } else {
+          result.innerText = `✅ ${name} 預約成功，我們將聯絡您！`;
+        }
+      }
+    </script>
+  </body>
+</html>
