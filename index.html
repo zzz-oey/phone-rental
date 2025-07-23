@@ -17,6 +17,11 @@
         padding: 10px;
         font-size: 16px;
       }
+      label {
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -28,6 +33,12 @@
     <label>聯絡電話</label>
     <input type="text" id="phone" placeholder="請輸入電話號碼" />
 
+    <label>租借日期（起）</label>
+    <input type="date" id="startDate" />
+
+    <label>租借日期（迄）</label>
+    <input type="date" id="endDate" />
+
     <button onclick="submitForm()">送出預約</button>
 
     <p id="result" style="margin-top:20px; font-weight: bold;"></p>
@@ -36,12 +47,14 @@
       function submitForm() {
         const name = document.getElementById('name').value;
         const phone = document.getElementById('phone').value;
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
         const result = document.getElementById('result');
 
-        if (!name || !phone) {
-          result.innerText = '❗️請填寫完整資訊';
+        if (!name || !phone || !start || !end) {
+          result.innerText = '❗️請填寫所有欄位';
         } else {
-          result.innerText = `✅ ${name} 預約成功，我們將聯絡您！`;
+          result.innerText = `✅ ${name} 的預約已提交！\n租借期間：${start} 至 ${end}`;
         }
       }
     </script>
