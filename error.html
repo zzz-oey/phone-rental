@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>預約失敗</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      padding: 32px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 400px;
+    }
+    h1 {
+      font-size: 22px;
+      color: #d93025; /* 紅色強調 */
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 20px;
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+    .btn:hover {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>❌ 預約失敗</h1>
+    <p>抱歉，您選擇的日期可能已被預約，或發生其他錯誤。</p>
+    <p>請返回首頁並重新選擇日期或再試一次。</p>
+    <a href="index.html" class="btn">返回首頁</a>
+  </div>
+</body>
+</html>
