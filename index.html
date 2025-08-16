@@ -33,17 +33,14 @@
       border-radius: 4px;
     }
     .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0;
-      flex-wrap: wrap;
+      margin-top: 20px;
     }
     .checkbox-group input[type="checkbox"] {
-      margin: 0;
+      transform: scale(1.2);
+      vertical-align: middle;
+      margin-right: 8px;
     }
     .checkbox-group label {
-      margin: 0;
       font-weight: normal;
     }
     #summary {
@@ -159,7 +156,6 @@
         }
       });
 
-      // 表單送出
       document.getElementById("rental-form").addEventListener("submit", async function(e) {
         e.preventDefault();
         const form = e.target;
