@@ -35,10 +35,16 @@
     .checkbox-group {
       display: flex;
       align-items: center;
+      gap: 8px;
       margin: 10px 0;
+      flex-wrap: wrap;
     }
-    .checkbox-group input {
-      margin-right: 8px;
+    .checkbox-group input[type="checkbox"] {
+      margin: 0;
+    }
+    .checkbox-group label {
+      margin: 0;
+      font-weight: normal;
     }
     #summary {
       background: #eef;
@@ -71,7 +77,6 @@
 
     <label for="daterange">租借日期區間</label>
     <input type="text" id="daterange" required placeholder="請選擇日期區間" />
-
     <div id="summary"></div>
 
     <label for="days">租借天數</label>
@@ -154,7 +159,7 @@
         }
       });
 
-      // 送出表單
+      // 表單送出
       document.getElementById("rental-form").addEventListener("submit", async function(e) {
         e.preventDefault();
         const form = e.target;
