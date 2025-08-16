@@ -6,207 +6,298 @@
   <title>手機租借預約</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <style>
-    body {
-      font-family: "Helvetica Neue", sans-serif;
-      background: #f9f9f9;
-      padding: 24px;
-      max-width: 600px;
-      margin: auto;
+    :root{
+      --gap:16px;
+      --gap-lg:24px;
+      --radius:10px;
+      --border:#dcdcdc;
+      --text:#111;
+      --muted:#666;
+      --bg:#f7f7f7;
+      --white:#fff;
+      --btn:#000;
+      --btn-hover:#222;
     }
-    h1 {
-      font-size: 24px;
-      text-align: center;
-      margin-bottom: 24px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family:"Helvetica Neue",Arial,system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;
+      color:var(--text);
+      background:var(--bg);
+      margin:0;
+      padding:var(--gap-lg);
+      display:flex;
+      justify-content:center;
     }
-    label {
-      font-weight: bold;
-      margin-top: 20px;
-      display: block;
+    .container{
+      width:100%;
+      max-width:640px;
+      background:var(--white);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:0 6px 18px rgba(0,0,0,.06);
+      padding:clamp(16px,3.5vw,28px);
     }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    h1{
+      font-size:clamp(20px,3.6vw,26px);
+      text-align:center;
+      margin:0 0 var(--gap-lg);
+      letter-spacing:.5px;
     }
-    .form-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0 20px 0;
+
+    /* 表單排版 */
+    .form-row{margin-bottom:var(--gap-lg);}
+    .label{
+      display:block;
+      font-weight:700;
+      margin-bottom:8px;
+      line-height:1.25;
     }
-    .form-checkbox label {
-      display: inline;
-      margin: 0;
+    .control{
+      width:100%;
+      display:block;
+      padding:12px 12px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      font-size:16px;
+      line-height:1.2;
+      background:#fff;
+      outline:none;
     }
-    .form-checkbox input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      margin: 0;
+    .control:focus{border-color:#999; box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+    textarea.control{min-height:110px; resize:vertical}
+
+    /* checkbox 對齊 */
+    .checkbox{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:4px;
     }
-    button {
-      background: #000;
-      color: #fff;
-      font-size: 16px;
-      padding: 12px;
-      width: 100%;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    .checkbox input[type="checkbox"]{
+      width:20px;height:20px; margin:0;
+      accent-color:#111;
     }
-    #summary {
-      background: #eef;
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: -8px;
-      margin-bottom: 12px;
-      font-size: 16px;
+    .hint{color:var(--muted); font-size:14px; margin-top:6px}
+
+    /* 摘要卡片 */
+    .summary{
+      display:none;
+      background:#eef3ff;
+      border:1px solid #dbe3ff;
+      color:#173b8e;
+      border-radius:8px;
+      padding:12px;
+      margin-top:-6px;
+      margin-bottom:var(--gap-lg);
+      line-height:1.6;
     }
-    #summary strong {
-      font-weight: 700;
+    .summary b{font-weight:700}
+
+    /* 送出按鈕 */
+    .actions{margin-top:28px}
+    button{
+      appearance:none;
+      width:100%;
+      background:var(--btn);
+      color:#fff;
+      font-size:16px;
+      border:none;
+      border-radius:10px;
+      padding:14px 18px;
+      cursor:pointer;
+    }
+    button:hover{background:var(--btn-hover)}
+    button[disabled]{opacity:.6; cursor:not-allowed}
+
+    @media (max-width:480px){
+      .container{padding:18px}
     }
   </style>
 </head>
 <body>
-  <h1>手機租借預約</h1>
+  <main class="container">
+    <h1>手機租借預約</h1>
 
-  <form id="rental-form">
-    <label for="name">姓名</label>
-    <input type="text" id="name" name="name" required />
+    <form id="rental-form" novalidate>
+      <div class="form-row">
+        <label class="label" for="name">姓名</label>
+        <input class="control" type="text" id="name" name="name" required />
+      </div>
 
-    <label for="phone">聯絡電話</label>
-    <input type="tel" id="phone" name="phone" required />
+      <div class="form-row">
+        <label class="label" for="phone">聯絡電話</label>
+        <input class="control" type="tel" id="phone" name="phone" required />
+      </div>
 
-    <label for="daterange">租借日期區間</label>
-    <input type="text" id="daterange" required placeholder="請選擇日期區間" />
+      <div class="form-row">
+        <label class="label" for="daterange">租借日期區間</label>
+        <input class="control" type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間" />
+      </div>
 
-    <div id="summary" style="display: none;">
-      📦 領取日：<strong id="pickup-date"></strong><br>
-      📦 還機日：<strong id="return-date"></strong><br>
-      ⏰ 租借天數：<strong id="rental-days"></strong>
-    </div>
+      <div id="summary" class="summary">
+        📦 領取日：<b id="pickup-date"></b><br />
+        📦 還機日：<b id="return-date"></b><br />
+        ⏰ 租借天數：<b id="rental-days"></b>
+      </div>
 
-    <label for="model">租借設備</label>
-    <select id="model" name="model">
-      <option>S23 Ultra 黑</option>
-    </select>
+      <div class="form-row">
+        <label class="label" for="model">租借設備</label>
+        <select class="control" id="model" name="model">
+          <option>S23 Ultra 黑</option>
+        </select>
+      </div>
 
-    <div class="form-checkbox">
-      <input type="checkbox" id="charger" name="charger" />
-      <label for="charger">需要 Type-C 充電頭</label>
-    </div>
+      <div class="form-row">
+        <label class="label">加值配件</label>
+        <label class="checkbox" for="charger">
+          <input type="checkbox" id="charger" name="charger" />
+          <span>需要 Type-C 充電頭</span>
+        </label>
+      </div>
 
-    <label for="contact">IG 或 LINE ID</label>
-    <input type="text" id="contact" name="contact" required />
+      <div class="form-row">
+        <label class="label" for="contact">IG 或 LINE ID</label>
+        <input class="control" type="text" id="contact" name="contact" required />
+      </div>
 
-    <label for="pickup">預計取機地點</label>
-    <select id="pickup" name="pickup" required>
-      <option>弘大</option>
-      <option>新村</option>
-      <option>合井</option>
-      <option>望遠</option>
-      <option>永登浦周邊</option>
-    </select>
+      <div class="form-row">
+        <label class="label" for="pickup">預計取機地點</label>
+        <select class="control" id="pickup" name="pickup" required>
+          <option>弘大</option>
+          <option>新村</option>
+          <option>合井</option>
+          <option>望遠</option>
+          <option>永登浦周邊</option>
+        </select>
+      </div>
 
-    <label for="note">備註</label>
-    <textarea id="note" name="note"></textarea>
+      <div class="form-row">
+        <label class="label" for="note">備註</label>
+        <textarea class="control" id="note" name="note" placeholder="若有其他需求或時間調整可在此補充"></textarea>
+      </div>
 
-    <div class="form-checkbox">
-      <input type="checkbox" id="agree" required />
-      <label for="agree">我已閱讀並同意租借規則</label>
-    </div>
+      <div class="form-row">
+        <label class="checkbox" for="agree">
+          <input type="checkbox" id="agree" name="agree" required />
+          <span>我已閱讀並同意租借規則</span>
+        </label>
+        <div class="hint">送出代表同意租借及押金相關規範。</div>
+      </div>
 
-    <button type="submit">送出預約</button>
-  </form>
+      <div class="actions">
+        <button id="submitBtn" type="submit">送出預約</button>
+      </div>
+    </form>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    function getWeekday(date) {
-      return ['日', '一', '二', '三', '四', '五', '六'][date.getDay()];
-    }
+    // 👉 使用同一支合併後的 Apps Script Web App
+    // GET ?action=reserved 取得不可預約日期；POST 新增預約
+    const API_BASE = "https://script.google.com/macros/s/AKfycbyY875RTzxvTSWxUiXHtq_KJLtePhgnRfVfXsUNW9c/exec"; // /dev 也可
 
-    async function fetchReservedDates() {
-      // 🔗 合併後 API URL（同一個）
-      const API_URL = "https://script.google.com/macros/s/AKfycbyY875RTzxvTSWxUiXHtq_KJLtePhgnRfVfXsUNW9c/dev";
+    const $ = (id)=>document.getElementById(id);
+    const summary = $("summary");
+    const pickupEl = $("pickup-date");
+    const returnEl = $("return-date");
+    const daysEl = $("rental-days");
 
-      const res = await fetch(API_URL);
-      const data = await res.json();
+    function getWeekday(d){return ['日','一','二','三','四','五','六'][d.getDay()]}
 
-      const disabled = [];
-      data.forEach(range => {
-        const start = new Date(range.start);
-        const end = new Date(range.end);
-        while (start <= end) {
-          disabled.push(start.toISOString().split("T")[0]);
-          start.setDate(start.getDate() + 1);
-        }
-      });
+    async function init() {
+      // 1) 取得已被預約的區間 → 轉成禁用日期
+      let disabled = [];
+      try{
+        const r = await fetch(API_BASE + "?action=reserved");
+        const ranges = await r.json(); // [{start,end}]
+        ranges.forEach(({start,end})=>{
+          const s = new Date(start);
+          const e = new Date(end);
+          while (s <= e) {
+            disabled.push(s.toISOString().split("T")[0]);
+            s.setDate(s.getDate()+1);
+          }
+        });
+      }catch(err){
+        console.warn("取得預約區間失敗，先不禁用日期：", err);
+      }
 
-      flatpickr("#daterange", {
-        mode: "range",
-        minDate: "today",
-        dateFormat: "Y-m-d",
-        disable: disabled,
-        onChange: function(selectedDates) {
-          if (selectedDates.length === 2) {
-            const [start, end] = selectedDates;
-            const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
-            document.getElementById("summary").style.display = "block";
-            document.getElementById("pickup-date").textContent =
-              `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()}（${getWeekday(start)}）`;
-            document.getElementById("return-date").textContent =
-              `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}（${getWeekday(end)}）`;
-            document.getElementById("rental-days").textContent = `${days} 天`;
-          } else {
-            document.getElementById("summary").style.display = "none";
+      // 2) 初始化日期選擇
+      const fp = flatpickr("#daterange", {
+        mode:"range",
+        minDate:"today",
+        dateFormat:"Y-m-d",
+        disable:disabled,
+        onChange(selected){
+          if(selected.length===2){
+            const [s,e] = selected;
+            const days = Math.round((e - s)/86400000)+1;
+            summary.style.display = "block";
+            pickupEl.textContent = `${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()}（${getWeekday(s)}）`;
+            returnEl.textContent = `${e.getFullYear()}/${e.getMonth()+1}/${e.getDate()}（${getWeekday(e)}）`;
+            daysEl.textContent = `${days} 天`;
+          }else{
+            summary.style.display = "none";
           }
         }
       });
 
-      // 🟢 表單送出
-      document.getElementById("rental-form").addEventListener("submit", async function(e) {
+      // 3) 送出（成功 → thanks.html；失敗 → error.html）
+      document.getElementById("rental-form").addEventListener("submit", async (e)=>{
         e.preventDefault();
-        const form = e.target;
-        const [start, end] = document.getElementById("daterange")._flatpickr.selectedDates;
-        if (!start || !end) {
-          alert("請選擇完整的租借日期區間！");
-          return;
-        }
+        const f = e.target;
+        const [s,eDate] = $("daterange")._flatpickr.selectedDates;
 
-        const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        if(!s || !eDate){ alert("請選擇完整的租借日期區間！"); return; }
+        if(!$("agree").checked){ alert("請先勾選同意租借規則！"); return; }
+
+        const days = Math.round((eDate - s)/86400000)+1;
 
         const payload = {
-          name: form.name.value,
-          phone: form.phone.value,
-          startDate: start.toISOString().split("T")[0],
-          endDate: end.toISOString().split("T")[0],
+          name: f.name.value,
+          phone: f.phone.value,
+          startDate: s.toISOString().split("T")[0],
+          endDate: eDate.toISOString().split("T")[0],
           days: `${days} 天`,
-          model: form.model.value,
-          charger: form.charger.checked ? "需要" : "不需要",
-          contact: form.contact.value,
-          pickup: form.pickup.value,
-          note: form.note.value,
+          model: f.model.value,
+          charger: f.charger.checked ? "需要" : "不需要",
+          contact: f.contact.value,
+          pickup: f.pickup.value,
+          note: f.note.value,
           timestamp: new Date().toISOString(),
         };
 
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        const btn = $("submitBtn");
+        const txt = btn.textContent;
+        btn.disabled = true; btn.textContent = "送出中…";
 
-        const result = await res.json();
-        if (result.status === "success") {
-          window.location.href = "thanks.html"; // ✅ 成功後跳轉
-        } else {
-          alert("❌ 預約失敗：" + (result.message || "請稍後再試"));
+        try{
+          const res = await fetch(API_BASE, {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          let result;
+          try{ result = await res.json(); }
+          catch{ throw new Error("後端未回傳 JSON（請檢查 GAS 部署/權限）"); }
+
+          if(result && result.status === "success"){
+            window.location.href = "thanks.html";
+          }else{
+            window.location.href = "error.html";
+          }
+        }catch(err){
+          console.error(err);
+          window.location.href = "error.html";
+        }finally{
+          btn.disabled = false; btn.textContent = txt;
         }
       });
     }
 
-    fetchReservedDates();
+    init();
   </script>
 </body>
 </html>
