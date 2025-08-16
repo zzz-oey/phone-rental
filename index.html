@@ -86,15 +86,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    flatpickr("#dates", {
-      mode: "range",
-      dateFormat: "Y-m-d"
-    });
-
-    function handleSubmit() {
-      window.location.href = "thanks.html";
-      return false;
-    }
-  </script>
+  function handleSubmit() {
+    window.location.href = "thanks.html";
+    return false; // 阻止真正送出表單
+  }
+</script>
 </body>
 </html>
