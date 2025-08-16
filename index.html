@@ -2,191 +2,81 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>手機租借預約</title>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
       background: #f9f9f9;
-      padding: 24px;
-      max-width: 600px;
-      margin: auto;
-    }
-    h1 {
-      font-size: 24px;
-      text-align: center;
-      margin-bottom: 24px;
+      padding: 2rem;
     }
     label {
       font-weight: bold;
-      margin-top: 20px;
       display: block;
+      margin-top: 1.5rem;
     }
     input, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      font-size: 16px;
+      padding: 0.75rem;
+      font-size: 1rem;
+      margin-top: 0.5rem;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
+      box-sizing: border-box;
     }
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .checkbox-group input[type="checkbox"] {
-      margin: 0;
-    }
-    .checkbox-group label {
-      margin: 0;
-      font-weight: normal;
-    }
-    #summary {
-      background: #eef;
+    #rental-info {
+      background-color: #eef;
       padding: 12px;
-      border-radius: 4px;
-      margin-bottom: 12px;
+      border-radius: 6px;
+      margin-top: 0.75rem;
       display: none;
       line-height: 1.6;
-    }
-    button {
-      background: #000;
-      color: #fff;
-      font-size: 16px;
-      padding: 12px;
-      width: 100%;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>手機租借預約</h1>
 
-  <form id="rental-form">
-    <label for="name">姓名</label>
-    <input type="text" id="name" required />
-
-    <label for="phone">聯絡電話</label>
-    <input type="tel" id="phone" required />
-
+  <form>
+    <!-- 日期區間 -->
     <label for="daterange">租借日期區間</label>
     <input type="text" id="daterange" required placeholder="請選擇日期區間" />
-    <div id="summary"></div>
+    <div id="rental-info"></div>
 
-    <label for="model">租借設備</label>
-    <select id="model">
-      <option>S23 Ultra 黑</option>
-    </select>
-
-    <div class="checkbox-group">
-      <input type="checkbox" id="charger" />
-      <label for="charger">需要 Type-C 充電頭</label>
-    </div>
-
-    <label for="contact">IG 或 LINE ID</label>
-    <input type="text" id="contact" required />
-
-    <label for="pickup">預計取機地點</label>
-    <select id="pickup" required>
-      <option>弘大</option>
-      <option>新村</option>
-      <option>合井</option>
-      <option>望遠</option>
-      <option>永登浦周邊</option>
-    </select>
-
-    <label for="note">備註</label>
-    <textarea id="note"></textarea>
-
-    <div class="checkbox-group">
-      <input type="checkbox" id="agree" required />
-      <label for="agree">我已閱讀並同意租借規則</label>
-    </div>
-
-    <button type="submit">送出預約</button>
+    <!-- 其他欄位可自由插入 -->
   </form>
 
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    async function fetchReservedDates() {
-      const res = await fetch("https://script.google.com/macros/s/AKfycbxNBeTng-gU9frn-zMDXJUVfnytCalCSk1W7xLZXzJ63dmtH6A2gN7b9m1HrinPrd1q/exec");
-      const data = await res.json();
-
-      const disabled = [];
-      data.forEach(range => {
-        const start = new Date(range.start);
-        const end = new Date(range.end);
-        while (start <= end) {
-          disabled.push(start.toISOString().split("T")[0]);
-          start.setDate(start.getDate() + 1);
-        }
-      });
-
-      const fp = flatpickr("#daterange", {
-        mode: "range",
-        minDate: "today",
-        dateFormat: "Y-m-d",
-        disable: disabled,
-        onChange: function(selectedDates) {
-          const summary = document.getElementById("summary");
-          if (selectedDates.length === 2) {
-            const start = selectedDates[0];
-            const end = selectedDates[1];
-            const getWeekday = (date) => date.toLocaleDateString('zh-TW', { weekday: 'short' });
-
-            const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
-            summary.innerHTML = `
-              📦 領取日：<strong>${start.getFullYear()}/${start.getMonth()+1}/${start.getDate()} (${getWeekday(start)})</strong><br>
-              📦 還機日：<strong>${end.getFullYear()}/${end.getMonth()+1}/${end.getDate()} (${getWeekday(end)})</strong><br>
-              ⏰ 租借天數：<strong>${days} 天</strong>
-            `;
-            summary.style.display = "block";
-          } else {
-            summary.style.display = "none";
-          }
-        }
-      });
-
-      document.getElementById("rental-form").addEventListener("submit", async function(e) {
-        e.preventDefault();
-        const form = e.target;
-        const [start, end] = document.getElementById("daterange")._flatpickr.selectedDates;
-        const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
-        const payload = {
-          name: form.name.value,
-          phone: form.phone.value,
-          startDate: start.toISOString().split("T")[0],
-          endDate: end.toISOString().split("T")[0],
-          days: days,
-          model: form.model.value,
-          charger: form.charger.checked ? "需要" : "不需要",
-          contact: form.contact.value,
-          pickup: form.pickup.value,
-          note: form.note.value,
-          timestamp: new Date().toISOString(),
-        };
-
-        await fetch("https://script.google.com/macros/s/【替換成你的API】/exec", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-
-        alert("預約成功！");
-        form.reset();
-        summary.style.display = "none";
-        fp.clear();
-      });
+    function getWeekdayName(date) {
+      return date.toLocaleDateString('zh-TW', { weekday: 'short' });
     }
 
-    fetchReservedDates();
+    flatpickr("#daterange", {
+      mode: "range",
+      minDate: "today",
+      dateFormat: "Y-m-d",
+      onChange: function(selectedDates) {
+        const rentalInfo = document.getElementById("rental-info");
+        if (selectedDates.length === 2) {
+          const start = selectedDates[0];
+          const end = selectedDates[1];
+
+          const startDateStr = `${start.getFullYear()}/${start.getMonth()+1}/${start.getDate()}（${getWeekdayName(start)}）`;
+          const endDateStr = `${end.getFullYear()}/${end.getMonth()+1}/${end.getDate()}（${getWeekdayName(end)}）`;
+          const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+          rentalInfo.innerHTML = `
+            📦 領取日：<strong>${startDateStr}</strong><br>
+            📦 還機日：<strong>${endDateStr}</strong><br>
+            ⏰ 租借天數：<strong>${diffDays} 天</strong>
+          `;
+          rentalInfo.style.display = "block";
+        } else {
+          rentalInfo.style.display = "none";
+        }
+      }
+    });
   </script>
 </body>
 </html>
