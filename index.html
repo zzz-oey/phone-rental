@@ -165,6 +165,11 @@
         e.preventDefault();
         const form = e.target;
         const [start, end] = document.getElementById("daterange")._flatpickr.selectedDates;
+        if (!start || !end) {
+          alert("請選擇完整的租借日期區間！");
+          return;
+        }
+
         const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
         const payload = {
@@ -181,15 +186,20 @@
           timestamp: new Date().toISOString(),
         };
 
-        await fetch("https://script.google.com/macros/s/【替換成你的API】/exec", {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbyY875RTzxvTSWxUiXHtq_KJLtePhgnRfVfXsUNW9c/dev", {
           method: "POST",
           body: JSON.stringify(payload),
         });
 
-        alert("預約成功！");
-        form.reset();
-        fp.clear();
-        document.getElementById("summary").style.display = "none";
+        const result = await res.json();
+        if (result.status === "success") {
+          alert("✅ 預約成功！");
+          form.reset();
+          fp.clear();
+          document.getElementById("summary").style.display = "none";
+        } else {
+          alert("❌ 預約失敗：" + (result.message || "請稍後再試"));
+        }
       });
     }
 
