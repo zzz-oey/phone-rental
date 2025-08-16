@@ -38,6 +38,10 @@
       gap: 10px;
       margin: 10px 0 20px 0;
     }
+    .form-checkbox label {
+      display: inline;
+      margin: 0;
+    }
     .form-checkbox input[type="checkbox"] {
       width: 20px;
       height: 20px;
@@ -162,6 +166,7 @@
         const form = e.target;
         const [start, end] = document.getElementById("daterange")._flatpickr.selectedDates;
 
+        // ✅ 強化防呆驗證
         if (!start || !end) {
           alert("請選擇完整的租借日期區間！");
           return;
@@ -195,7 +200,10 @@
 
         const result = await res.json();
         if (result.status === "success") {
-          window.location.href = "thanks.html";
+          alert("✅ 預約成功！");
+          form.reset();
+          fp.clear();
+          document.getElementById("summary").style.display = "none";
         } else {
           alert("❌ 預約失敗：" + (result.message || "請稍後再試"));
         }
