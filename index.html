@@ -3,65 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>手機租借表單</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+  <title>手機租借預約</title>
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: "Helvetica Neue", sans-serif;
+      font-family: sans-serif;
+      padding: 2rem;
       background-color: #f9f9f9;
       color: #333;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
     }
-
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
     form {
-      background: white;
-      padding: 2rem 2.5rem;
-      border-radius: 12px;
       max-width: 600px;
-      width: 100%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    h2 {
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
     label {
       display: block;
+      margin-top: 1.5rem;
       font-weight: bold;
-      margin-bottom: 0.5rem;
     }
-
-    input, select, textarea {
+    input[type="text"],
+    input[type="date"],
+    input[type="tel"],
+    input[type="email"],
+    textarea {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 5px;
       font-size: 1rem;
     }
-
-    textarea {
-      resize: vertical;
+    .checkbox-group {
+      margin-top: 1rem;
     }
-
-    .form-check {
+    .checkbox-group label {
+      font-weight: normal;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      margin-top: 0.5rem;
     }
-
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 0.5rem;
+    }
     button {
-      width: 100%;
       margin-top: 2rem;
+      width: 100%;
       padding: 0.75rem;
+      font-size: 1.1rem;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>手機租借預約表單</h1>
+  <form>
+    <label for="rental-dates">租借日期區間</label>
+    <input id="rental-dates" name="rental-dates" type="text" placeholder="選擇租借起始日與結束日" />
+
+    <label for="pickup-location">取機地點</label>
+    <input id="pickup-location" name="pickup-location" type="text" placeholder="如：弘大站1號出口" />
+
+    <label for="contact-info">聯絡方式（IG 或 LINE）</label>
+    <input id="contact-info" name="contact-info" type="text" placeholder="@yourID / LINE ID" />
+
+    <label for="note">備註</label>
+    <textarea id="note" name="note" rows="3" placeholder="例如：想要晚上領機、想要有手機殼等…"></textarea>
+
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="accessories" value="type-c" /> 需要 Type-C 充電線</label>
+      <label><input type="checkbox" name="accessories" value="cable" /> 需要掛繩</label>
+      <label><input type="checkbox" name="accessories" value="case" /> 需要手機殼</label>
+    </div>
+
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="agree" required /> 我已詳閱並同意租借須知</label>
+    </div>
+
+    <button type="submit">送出預約</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    flatpickr("#rental-dates", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      locale: "zh"
+    });
+  </script>
+</body>
+</html>
