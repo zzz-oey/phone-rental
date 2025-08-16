@@ -75,13 +75,13 @@
 
   <form id="rental-form">
     <label for="name">姓名</label>
-    <input type="text" id="name" name="name" required />
+    <input type="text" id="name" required />
 
     <label for="phone">聯絡電話</label>
-    <input type="tel" id="phone" name="phone" required />
+    <input type="tel" id="phone" required />
 
     <label for="daterange">租借日期區間</label>
-    <input type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間" />
+    <input type="text" id="daterange" required placeholder="請選擇日期區間" />
 
     <div id="summary" style="display: none;">
       📦 領取日：<strong id="pickup-date"></strong><br>
@@ -90,20 +90,20 @@
     </div>
 
     <label for="model">租借設備</label>
-    <select id="model" name="model">
+    <select id="model">
       <option>S23 Ultra 黑</option>
     </select>
 
     <div class="form-checkbox">
-      <input type="checkbox" id="charger" name="charger" />
+      <input type="checkbox" id="charger" />
       <label for="charger">需要 Type-C 充電頭</label>
     </div>
 
     <label for="contact">IG 或 LINE ID</label>
-    <input type="text" id="contact" name="contact" required />
+    <input type="text" id="contact" required />
 
     <label for="pickup">預計取機地點</label>
-    <select id="pickup" name="pickup" required>
+    <select id="pickup" required>
       <option>弘大</option>
       <option>新村</option>
       <option>合井</option>
@@ -112,10 +112,10 @@
     </select>
 
     <label for="note">備註</label>
-    <textarea id="note" name="note"></textarea>
+    <textarea id="note"></textarea>
 
     <div class="form-checkbox">
-      <input type="checkbox" id="agree" name="agree" required />
+      <input type="checkbox" id="agree" required />
       <label for="agree">我已閱讀並同意租借規則</label>
     </div>
 
@@ -165,15 +165,8 @@
         e.preventDefault();
         const form = e.target;
         const [start, end] = document.getElementById("daterange")._flatpickr.selectedDates;
-
-        // ✅ 強化防呆驗證
         if (!start || !end) {
           alert("請選擇完整的租借日期區間！");
-          return;
-        }
-
-        if (!form.agree.checked) {
-          alert("請先勾選同意租借規則！");
           return;
         }
 
