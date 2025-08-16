@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>手機租借預約表單</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
@@ -75,18 +76,8 @@
     <label for="phone">聯絡電話</label>
     <input type="tel" id="phone" name="phone" required />
 
-    <label for="date">租借日期（起始日）</label>
-    <input type="date" id="date" name="date" required />
-
-    <label for="days">租借天數</label>
-    <select id="days" name="days" required>
-      <option value="">請選擇</option>
-      <option value="1">1 天</option>
-      <option value="2">2 天</option>
-      <option value="3">3 天</option>
-      <option value="4">4 天</option>
-      <option value="5">5 天以上</option>
-    </select>
+    <label for="dateRange">租借日期（起始日 ~ 結束日）</label>
+    <input type="text" id="dateRange" name="dateRange" required placeholder="請選擇日期區間" />
 
     <label for="model">租借設備</label>
     <select id="model" name="model">
@@ -120,5 +111,21 @@
 
     <button type="submit">送出預約</button>
   </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      disable: [
+        // 這裡可以放不可租借日期（未來串接 Google Sheets 抓已租日）
+        "2025-08-18", "2025-08-19", "2025-08-25"
+      ],
+      locale: {
+        firstDayOfWeek: 1
+      }
+    });
+  </script>
 </body>
 </html>
