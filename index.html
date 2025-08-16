@@ -7,195 +7,116 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <style>
     :root{
-      --gap:16px;
-      --gap-lg:24px;
-      --radius:10px;
-      --border:#dcdcdc;
-      --text:#111;
-      --muted:#666;
-      --bg:#f7f7f7;
-      --white:#fff;
-      --btn:#000;
-      --btn-hover:#222;
+      --gap:16px; --gap-lg:24px; --border:#dcdcdc; --text:#111; --muted:#666; --bg:#f7f7f7; --btn:#000; --btn2:#222;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
-      font-family:"Helvetica Neue",Arial,system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;
-      color:var(--text);
-      background:var(--bg);
-      margin:0;
-      padding:var(--gap-lg);
-      display:flex;
-      justify-content:center;
+      font-family:"Helvetica Neue", Arial, "PingFang TC","Noto Sans TC", system-ui, sans-serif;
+      color:var(--text); background:var(--bg); margin:0;
+      padding:clamp(16px,4vw,32px); max-width:680px; margin-inline:auto;
     }
-    .container{
-      width:100%;
-      max-width:640px;
-      background:var(--white);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:0 6px 18px rgba(0,0,0,.06);
-      padding:clamp(16px,3.5vw,28px);
-    }
-    h1{
-      font-size:clamp(20px,3.6vw,26px);
-      text-align:center;
-      margin:0 0 var(--gap-lg);
-      letter-spacing:.5px;
-    }
-
-    /* 表單排版 */
-    .form-row{margin-bottom:var(--gap-lg);}
-    .label{
-      display:block;
-      font-weight:700;
-      margin-bottom:8px;
-      line-height:1.25;
-    }
+    h1{font-size:clamp(22px,4vw,28px); text-align:center; margin:0 0 var(--gap-lg)}
+    .form-row{margin-bottom:var(--gap-lg)}
+    .label{display:block; font-weight:700; margin-bottom:8px}
     .control{
-      width:100%;
-      display:block;
-      padding:12px 12px;
-      border:1px solid var(--border);
-      border-radius:8px;
-      font-size:16px;
-      line-height:1.2;
-      background:#fff;
-      outline:none;
+      width:100%; display:block; padding:12px; font-size:16px; line-height:1.2;
+      border:1px solid var(--border); border-radius:8px; background:#fff; outline:none;
     }
     .control:focus{border-color:#999; box-shadow:0 0 0 3px rgba(0,0,0,.06)}
     textarea.control{min-height:110px; resize:vertical}
-
-    /* checkbox 對齊 */
-    .checkbox{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-top:4px;
-    }
-    .checkbox input[type="checkbox"]{
-      width:20px;height:20px; margin:0;
-      accent-color:#111;
-    }
+    .checkbox{display:flex; align-items:center; gap:10px}
+    .checkbox input{width:20px; height:20px; margin:0; accent-color:#111}
     .hint{color:var(--muted); font-size:14px; margin-top:6px}
-
-    /* 摘要卡片 */
     .summary{
-      display:none;
-      background:#eef3ff;
-      border:1px solid #dbe3ff;
-      color:#173b8e;
-      border-radius:8px;
-      padding:12px;
-      margin-top:-6px;
-      margin-bottom:var(--gap-lg);
-      line-height:1.6;
+      display:none; background:#eef3ff; border:1px solid #dbe3ff; color:#173b8e;
+      border-radius:8px; padding:12px; margin-top:-6px; margin-bottom:var(--gap-lg); line-height:1.6;
     }
     .summary b{font-weight:700}
-
-    /* 送出按鈕 */
     .actions{margin-top:28px}
     button{
-      appearance:none;
-      width:100%;
-      background:var(--btn);
-      color:#fff;
-      font-size:16px;
-      border:none;
-      border-radius:10px;
-      padding:14px 18px;
-      cursor:pointer;
+      width:100%; padding:14px 18px; font-size:16px; border:none; border-radius:10px;
+      color:#fff; background:var(--btn); cursor:pointer;
     }
-    button:hover{background:var(--btn-hover)}
+    button:hover{background:var(--btn2)}
     button[disabled]{opacity:.6; cursor:not-allowed}
-
-    @media (max-width:480px){
-      .container{padding:18px}
-    }
   </style>
 </head>
 <body>
-  <main class="container">
-    <h1>手機租借預約</h1>
+  <h1>手機租借預約</h1>
 
-    <form id="rental-form" novalidate>
-      <div class="form-row">
-        <label class="label" for="name">姓名</label>
-        <input class="control" type="text" id="name" name="name" required />
-      </div>
+  <form id="rental-form" novalidate>
+    <div class="form-row">
+      <label class="label" for="name">姓名</label>
+      <input class="control" type="text" id="name" name="name" required />
+    </div>
 
-      <div class="form-row">
-        <label class="label" for="phone">聯絡電話</label>
-        <input class="control" type="tel" id="phone" name="phone" required />
-      </div>
+    <div class="form-row">
+      <label class="label" for="phone">聯絡電話</label>
+      <input class="control" type="tel" id="phone" name="phone" required />
+    </div>
 
-      <div class="form-row">
-        <label class="label" for="daterange">租借日期區間</label>
-        <input class="control" type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間" />
-      </div>
+    <div class="form-row">
+      <label class="label" for="daterange">租借日期區間</label>
+      <input class="control" type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間" />
+    </div>
 
-      <div id="summary" class="summary">
-        📦 領取日：<b id="pickup-date"></b><br />
-        📦 還機日：<b id="return-date"></b><br />
-        ⏰ 租借天數：<b id="rental-days"></b>
-      </div>
+    <div id="summary" class="summary">
+      📦 領取日：<b id="pickup-date"></b><br />
+      📦 還機日：<b id="return-date"></b><br />
+      ⏰ 租借天數：<b id="rental-days"></b>
+    </div>
 
-      <div class="form-row">
-        <label class="label" for="model">租借設備</label>
-        <select class="control" id="model" name="model">
-          <option>S23 Ultra 黑</option>
-        </select>
-      </div>
+    <div class="form-row">
+      <label class="label" for="model">租借設備</label>
+      <select class="control" id="model" name="model">
+        <option>S23 Ultra 黑</option>
+      </select>
+    </div>
 
-      <div class="form-row">
-        <label class="label">加值配件</label>
-        <label class="checkbox" for="charger">
-          <input type="checkbox" id="charger" name="charger" />
-          <span>需要 Type-C 充電頭</span>
-        </label>
-      </div>
+    <div class="form-row">
+      <label class="label">加值配件</label>
+      <label class="checkbox" for="charger">
+        <input type="checkbox" id="charger" name="charger" />
+        <span>需要 Type-C 充電頭</span>
+      </label>
+    </div>
 
-      <div class="form-row">
-        <label class="label" for="contact">IG 或 LINE ID</label>
-        <input class="control" type="text" id="contact" name="contact" required />
-      </div>
+    <div class="form-row">
+      <label class="label" for="contact">IG 或 LINE ID</label>
+      <input class="control" type="text" id="contact" name="contact" required />
+    </div>
 
-      <div class="form-row">
-        <label class="label" for="pickup">預計取機地點</label>
-        <select class="control" id="pickup" name="pickup" required>
-          <option>弘大</option>
-          <option>新村</option>
-          <option>合井</option>
-          <option>望遠</option>
-          <option>永登浦周邊</option>
-        </select>
-      </div>
+    <div class="form-row">
+      <label class="label" for="pickup">預計取機地點</label>
+      <select class="control" id="pickup" name="pickup" required>
+        <option>弘大</option>
+        <option>新村</option>
+        <option>合井</option>
+        <option>望遠</option>
+      </select>
+    </div>
 
-      <div class="form-row">
-        <label class="label" for="note">備註</label>
-        <textarea class="control" id="note" name="note" placeholder="若有其他需求或時間調整可在此補充"></textarea>
-      </div>
+    <div class="form-row">
+      <label class="label" for="note">備註</label>
+      <textarea class="control" id="note" name="note" placeholder="若有其他需求或時間調整可在此補充"></textarea>
+    </div>
 
-      <div class="form-row">
-        <label class="checkbox" for="agree">
-          <input type="checkbox" id="agree" name="agree" required />
-          <span>我已閱讀並同意租借規則</span>
-        </label>
-        <div class="hint">送出代表同意租借及押金相關規範。</div>
-      </div>
+    <div class="form-row">
+      <label class="checkbox" for="agree">
+        <input type="checkbox" id="agree" name="agree" required />
+        <span>我已閱讀並同意租借規則</span>
+      </label>
+      <div class="hint">送出代表同意租借及押金相關規範。</div>
+    </div>
 
-      <div class="actions">
-        <button id="submitBtn" type="submit">送出預約</button>
-      </div>
-    </form>
-  </main>
+    <div class="actions">
+      <button id="submitBtn" type="submit">送出預約</button>
+    </div>
+  </form>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    // 👉 使用同一支合併後的 Apps Script Web App
-    // GET ?action=reserved 取得不可預約日期；POST 新增預約
-    const API_BASE = "https://script.google.com/macros/s/AKfycbyY875RTzxvTSWxUiXHtq_KJLtePhgnRfVfXsUNW9c/exec"; // /dev 也可
+    const API_BASE = "https://script.google.com/macros/s/AKfycby-LkVDLtn_beMKzxjD6HNTgsS4ddARr4ZVq_2EiK3D35rQrREynhl3dhFLBsWxs_kZ/exec";
 
     const $ = (id)=>document.getElementById(id);
     const summary = $("summary");
@@ -206,7 +127,7 @@
     function getWeekday(d){return ['日','一','二','三','四','五','六'][d.getDay()]}
 
     async function init() {
-      // 1) 取得已被預約的區間 → 轉成禁用日期
+      // 1) 抓已預約區間並禁用
       let disabled = [];
       try{
         const r = await fetch(API_BASE + "?action=reserved");
@@ -220,10 +141,10 @@
           }
         });
       }catch(err){
-        console.warn("取得預約區間失敗，先不禁用日期：", err);
+        console.warn("取得預約區間失敗：", err);
       }
 
-      // 2) 初始化日期選擇
+      // 2) 日期選擇器
       const fp = flatpickr("#daterange", {
         mode:"range",
         minDate:"today",
@@ -261,15 +182,14 @@
           endDate: eDate.toISOString().split("T")[0],
           days: `${days} 天`,
           model: f.model.value,
-          charger: f.charger.checked ? "需要" : "不需要",
+          charger: f.charger?.checked ? "需要" : "不需要",
           contact: f.contact.value,
           pickup: f.pickup.value,
           note: f.note.value,
           timestamp: new Date().toISOString(),
         };
 
-        const btn = $("submitBtn");
-        const txt = btn.textContent;
+        const btn = $("submitBtn"); const txt = btn.textContent;
         btn.disabled = true; btn.textContent = "送出中…";
 
         try{
@@ -296,7 +216,6 @@
         }
       });
     }
-
     init();
   </script>
 </body>
