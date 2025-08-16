@@ -36,17 +36,14 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin: 10px 0 12px 0;
+      margin-top: 10px;
     }
     .checkbox-group input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
       margin: 0;
     }
     .checkbox-group label {
       margin: 0;
       font-weight: normal;
-      flex: 1;
     }
     #summary {
       background: #eef;
@@ -54,6 +51,7 @@
       border-radius: 4px;
       margin-bottom: 12px;
       display: none;
+      line-height: 1.6;
     }
     button {
       background: #000;
@@ -80,16 +78,6 @@
     <label for="daterange">租借日期區間</label>
     <input type="text" id="daterange" required placeholder="請選擇日期區間" />
     <div id="summary"></div>
-
-    <label for="days">租借天數</label>
-    <select id="days" required>
-      <option value="">請選擇</option>
-      <option value="1">1 天</option>
-      <option value="2">2 天</option>
-      <option value="3">3 天</option>
-      <option value="4">4 天</option>
-      <option value="5">5 天以上</option>
-    </select>
 
     <label for="model">租借設備</label>
     <select id="model">
@@ -148,11 +136,16 @@
         onChange: function(selectedDates) {
           const summary = document.getElementById("summary");
           if (selectedDates.length === 2) {
-            const start = selectedDates[0].toLocaleDateString();
-            const end = selectedDates[1].toLocaleDateString();
+            const start = selectedDates[0];
+            const end = selectedDates[1];
+            const getWeekday = (date) => date.toLocaleDateString('zh-TW', { weekday: 'short' });
+
+            const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
             summary.innerHTML = `
-              📦 領取日：<strong>${start}</strong><br>
-              📦 還機日：<strong>${end}</strong>
+              📦 領取日：<strong>${start.getFullYear()}/${start.getMonth()+1}/${start.getDate()} (${getWeekday(start)})</strong><br>
+              📦 還機日：<strong>${end.getFullYear()}/${end.getMonth()+1}/${end.getDate()} (${getWeekday(end)})</strong><br>
+              ⏰ 租借天數：<strong>${days} 天</strong>
             `;
             summary.style.display = "block";
           } else {
@@ -165,12 +158,14 @@
         e.preventDefault();
         const form = e.target;
         const [start, end] = document.getElementById("daterange")._flatpickr.selectedDates;
+        const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
         const payload = {
           name: form.name.value,
           phone: form.phone.value,
           startDate: start.toISOString().split("T")[0],
           endDate: end.toISOString().split("T")[0],
-          days: form.days.value,
+          days: days,
           model: form.model.value,
           charger: form.charger.checked ? "需要" : "不需要",
           contact: form.contact.value,
