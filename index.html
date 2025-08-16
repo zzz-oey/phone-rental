@@ -1,185 +1,154 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <title>手機租借預約表單</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- 引入 flatpickr -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
+  <meta charset="UTF-8">
+  <title>手機租借預約</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     body {
-      font-family: "Helvetica Neue", sans-serif;
-      padding: 30px;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
       max-width: 600px;
       margin: auto;
     }
 
-    h1 {
+    h2 {
       text-align: center;
-      margin-bottom: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     label {
-      display: block;
       font-weight: bold;
-      margin: 20px 0 6px;
+      margin-bottom: 0.3rem;
     }
 
     input, select, textarea {
+      padding: 0.5rem;
+      font-size: 1rem;
       width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
     }
 
     .checkbox-group {
       display: flex;
       align-items: center;
-      margin: 16px 0;
+      gap: 0.5rem;
     }
 
-    .checkbox-group input {
-      margin-right: 10px;
-      transform: scale(1.2);
+    .checkbox-group label {
+      font-weight: normal;
+    }
+
+    .summary {
+      background: #f9f9f9;
+      border-left: 4px solid #aaa;
+      padding: 0.75rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
     }
 
     button {
-      background-color: #222;
-      color: #fff;
-      padding: 12px;
+      background-color: black;
+      color: white;
+      padding: 0.75rem;
+      font-size: 1rem;
       border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      width: 100%;
       cursor: pointer;
-      margin-top: 20px;
+      border-radius: 4px;
     }
 
     button:hover {
-      background-color: #444;
-    }
-
-    .note {
-      font-size: 14px;
-      color: #666;
-      margin-top: -10px;
-      margin-bottom: 10px;
+      background-color: #333;
     }
   </style>
 </head>
 <body>
-  <h1>手機租借預約表單</h1>
-  <form id="rentalForm">
-    <label for="name">姓名</label>
-    <input type="text" id="name" name="name" required />
 
-    <label for="phone">聯絡電話</label>
-    <input type="tel" id="phone" name="phone" required />
+<h2>📱 手機租借預約表單</h2>
 
-    <label for="startDate">租借起始日</label>
-    <input type="text" id="startDate" name="startDate" required readonly />
+<form id="bookingForm">
+  <label for="name">IG帳號 或 LINE ID</label>
+  <input type="text" id="name" name="name" placeholder="@your_ig 或 line_id" required>
 
-    <label for="days">租借天數</label>
-    <select id="days" name="days" required>
-      <option value="">請選擇</option>
-      <option value="1">1 天</option>
-      <option value="2">2 天</option>
-      <option value="3">3 天</option>
-      <option value="4">4 天</option>
-      <option value="5">5 天以上</option>
-    </select>
+  <label for="range">租借日期區間（含領取日與還機日）</label>
+  <input type="text" id="range" name="range" required>
 
-    <label for="model">租借設備</label>
-    <select id="model" name="model">
-      <option>S23 Ultra 墨竹綠</option>
-    </select>
+  <label for="location">預計取機地點</label>
+  <select id="location" name="location" required>
+    <option value="弘大">弘大</option>
+    <option value="龍山">龍山</option>
+    <option value="明洞">明洞</option>
+  </select>
 
-    <div class="checkbox-group">
-      <input type="checkbox" id="charger" name="charger" />
-      <label for="charger">是否需要 Type-C 充電頭</label>
-    </div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="needCharger" name="needCharger">
+    <label for="needCharger">是否需要 Type-C 充電頭</label>
+  </div>
 
-    <label for="contact">IG帳號 或 LINE ID</label>
-    <input type="text" id="contact" name="contact" placeholder="@your_ig 或 line_id" required />
+  <label for="note">備註</label>
+  <textarea id="note" name="note" rows="3" placeholder="如有特殊需求請備註"></textarea>
 
-    <label for="pickup">預計取機地點</label>
-    <select id="pickup" name="pickup" required>
-      <option>弘大</option>
-      <option>新村</option>
-      <option>合井</option>
-      <option>望遠</option>
-      <option>永登浦周邊</option>
-    </select>
+  <div class="checkbox-group">
+    <input type="checkbox" id="agree" required>
+    <label for="agree">我已閱讀並同意租借規則</label>
+  </div>
 
-    <label for="note">備註</label>
-    <textarea id="note" name="note" placeholder="如有特殊需求請備註"></textarea>
+  <div class="summary" id="summaryText">📆 尚未選擇日期</div>
 
-    <div class="checkbox-group">
-      <input type="checkbox" id="agree" name="agree" required />
-      <label for="agree">我已閱讀並同意租借規則</label>
-    </div>
+  <button type="submit">送出預約</button>
+</form>
 
-    <button type="submit">送出預約</button>
-  </form>
-
-  <script>
-    // 替換成你自己的 Apps Script 網址
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzG5uBclXUVjO2QeBw-tWchrd34fJIzNrnd8IdvcQSayuVOCXnzkbe6edfH_DRAAxBl/exec';
-
-    // 初始已被預約的日期
-    let reservedDates = [];
-
-    // 載入時從 API 讀取已預約日
-    async function fetchReservedDates() {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        reservedDates = data.map(row => row.startDate);
-        initDatePicker();
-      } catch (err) {
-        alert('無法讀取已預約日，請稍後再試');
-        console.error(err);
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  const disabledDates = []; // 未來可串接後端拉資料填入
+  const fp = flatpickr("#range", {
+    mode: "range",
+    minDate: "today",
+    dateFormat: "Y-m-d",
+    disable: disabledDates,
+    onChange: function(selectedDates) {
+      const summary = document.getElementById('summaryText');
+      if (selectedDates.length === 2) {
+        const start = selectedDates[0].toLocaleDateString();
+        const end = selectedDates[1].toLocaleDateString();
+        summary.textContent = `📦 預計領取：${start}，歸還：${end}`;
+      } else {
+        summary.textContent = "📆 尚未選擇完整區間";
       }
     }
+  });
 
-    // 初始化日期選擇器，disable 已預約日
-    function initDatePicker() {
-      flatpickr("#startDate", {
-        dateFormat: "Y-m-d",
-        disable: reservedDates,
-        minDate: "today"
-      });
-    }
+  const form = document.getElementById("bookingForm");
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-    // 表單送出
-    document.getElementById("rentalForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+    const formData = {
+      name: form.name.value,
+      range: form.range.value,
+      location: form.location.value,
+      needCharger: form.needCharger.checked ? "需要" : "不需要",
+      note: form.note.value
+    };
 
-      const formData = new FormData(this);
-      const data = Object.fromEntries(formData.entries());
-
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          mode: "no-cors", // 如果你有設 Apps Script CORS，可以改為 'cors'
-          body: new URLSearchParams(data),
-        });
-
-        alert("✅ 預約已送出！");
-        this.reset();
-      } catch (err) {
-        alert("❌ 預約失敗，請稍後再試");
-        console.error(err);
-      }
+    fetch("https://script.google.com/macros/s/AKfycbzG5uBclXUVjO2QeBw-tWchrd34fJIzNrnd8IdvcQSayuVOCXnzkbe6edfH_DRAAxBl/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
     });
 
-    // 開始載入預約日
-    fetchReservedDates();
-  </script>
+    alert("已送出預約！我們會盡快與您聯繫！");
+    form.reset();
+    document.getElementById("summaryText").textContent = "📆 尚未選擇日期";
+    fp.clear();
+  });
+</script>
+
 </body>
 </html>
