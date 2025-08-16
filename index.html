@@ -13,61 +13,22 @@
       max-width: 600px;
       margin: auto;
     }
-    h1 {
-      font-size: 24px;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 20px;
-      display: block;
-    }
+    h1 { font-size: 24px; text-align: center; margin-bottom: 24px; }
+    label { font-weight: bold; margin-top: 20px; display: block; }
     input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      width: 100%; padding: 10px; margin-top: 4px; margin-bottom: 12px;
+      font-size: 16px; border: 1px solid #ccc; border-radius: 4px;
     }
-    .form-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0 20px 0;
-    }
-    .form-checkbox label {
-      display: inline;
-      margin: 0;
-    }
-    .form-checkbox input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      margin: 0;
-    }
+    .form-checkbox { display: flex; align-items: center; gap: 10px; margin: 10px 0 20px 0; }
+    .form-checkbox input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
     button {
-      background: #000;
-      color: #fff;
-      font-size: 16px;
-      padding: 12px;
-      width: 100%;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      background: #000; color: #fff; font-size: 16px; padding: 12px; width: 100%;
+      border: none; border-radius: 4px; cursor: pointer;
     }
     #summary {
-      background: #eef;
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: -8px;
-      margin-bottom: 12px;
-      font-size: 16px;
+      background: #eef; padding: 12px; border-radius: 6px; margin-top: -8px; margin-bottom: 12px; font-size: 16px;
     }
-    #summary strong {
-      font-weight: 700;
-    }
+    #summary strong { font-weight: 700; }
   </style>
 </head>
 <body>
@@ -81,7 +42,7 @@
     <input type="tel" id="phone" name="phone" required />
 
     <label for="daterange">租借日期區間</label>
-    <input type="text" id="daterange" required placeholder="請選擇日期區間" />
+    <input type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間" />
 
     <div id="summary" style="display: none;">
       📦 領取日：<strong id="pickup-date"></strong><br>
@@ -115,11 +76,11 @@
     <textarea id="note" name="note"></textarea>
 
     <div class="form-checkbox">
-      <input type="checkbox" id="agree" required />
+      <input type="checkbox" id="agree" name="agree" required />
       <label for="agree">我已閱讀並同意租借規則</label>
     </div>
 
-    <button type="submit">送出預約</button>
+    <button id="submitBtn" type="submit">送出預約</button>
   </form>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -147,13 +108,15 @@
         minDate: "today",
         dateFormat: "Y-m-d",
         disable: disabled,
-        onChange: function(selectedDates) {
+        onChange(selectedDates) {
           if (selectedDates.length === 2) {
             const [start, end] = selectedDates;
             const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
             document.getElementById("summary").style.display = "block";
-            document.getElementById("pickup-date").textContent = `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()}（${getWeekday(start)}）`;
-            document.getElementById("return-date").textContent = `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}（${getWeekday(end)}）`;
+            document.getElementById("pickup-date").textContent =
+              `${start.getFullYear()}/${start.getMonth()+1}/${start.getDate()}（${getWeekday(start)}）`;
+            document.getElementById("return-date").textContent =
+              `${end.getFullYear()}/${end.getMonth()+1}/${end.getDate()}（${getWeekday(end)}）`;
             document.getElementById("rental-days").textContent = `${days} 天`;
           } else {
             document.getElementById("summary").style.display = "none";
@@ -164,11 +127,12 @@
       document.getElementById("rental-form").addEventListener("submit", async function(e) {
         e.preventDefault();
         const form = e.target;
+        const btn = document.getElementById("submitBtn");
         const [start, end] = document.getElementById("daterange")._flatpickr.selectedDates;
-        if (!start || !end) {
-          alert("請選擇完整的租借日期區間！");
-          return;
-        }
+
+        // 基本驗證
+        if (!start || !end) { alert("請選擇完整的租借日期區間！"); return; }
+        if (!form.agree.checked) { alert("請先勾選同意租借規則！"); return; }
 
         const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
@@ -186,16 +150,38 @@
           timestamp: new Date().toISOString(),
         };
 
-        const res = await fetch("https://script.google.com/macros/s/AKfycbyY875RTzxvTSWxUiXHtq_KJLtePhgnRfVfXsUNW9c/dev", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        // 防重複提交
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.textContent = "送出中…";
 
-        const result = await res.json();
-        if (result.status === "success") {
-          window.location.href = "thanks.html"; // ✅ 送出成功後跳轉
-        } else {
-          alert("❌ 預約失敗：" + (result.message || "請稍後再試"));
+        try {
+          const res = await fetch("https://script.google.com/macros/s/AKfycbyY875RTzxvTSWxUiXHtq_KJLtePhgnRfVfXsUNW9c/dev", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          // 有些情況 GAS 會回 HTML 或空回應，這裡保護一下
+          let result;
+          try {
+            result = await res.json();
+          } catch (_) {
+            throw new Error("後端未回傳 JSON（可能是權限或部署設定有誤）");
+          }
+
+          if (result && result.status === "success") {
+            // ✅ 成功才跳轉
+            window.location.href = "thanks.html";
+          } else {
+            alert("❌ 預約失敗：" + (result?.message || "請稍後再試"));
+          }
+        } catch (err) {
+          console.error(err);
+          alert("❌ 送出失敗：" + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = originalText;
         }
       });
     }
