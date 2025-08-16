@@ -2,54 +2,52 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>手機租借預約表單</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 引入 flatpickr -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
   <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
       padding: 30px;
-      background-color: #fff;
       max-width: 600px;
       margin: auto;
     }
+
     h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
       text-align: center;
+      margin-bottom: 24px;
     }
+
     label {
-      font-weight: bold;
-      margin-top: 20px;
-      margin-bottom: 6px;
       display: block;
+      font-weight: bold;
+      margin: 20px 0 6px;
     }
-    input[type="text"],
-    input[type="tel"],
-    input[type="date"],
-    select,
-    textarea {
+
+    input, select, textarea {
       width: 100%;
       padding: 10px;
       font-size: 16px;
       margin-bottom: 12px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      box-sizing: border-box;
     }
+
     .checkbox-group {
       display: flex;
       align-items: center;
       margin: 16px 0;
     }
-    .checkbox-group input[type="checkbox"] {
+
+    .checkbox-group input {
       margin-right: 10px;
       transform: scale(1.2);
     }
-    .checkbox-group label {
-      margin: 0;
-      font-weight: bold;
-    }
+
     button {
       background-color: #222;
       color: #fff;
@@ -61,27 +59,44 @@
       cursor: pointer;
       margin-top: 20px;
     }
+
     button:hover {
       background-color: #444;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #666;
+      margin-top: -10px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
   <h1>手機租借預約表單</h1>
-
-  <form>
+  <form id="rentalForm">
     <label for="name">姓名</label>
     <input type="text" id="name" name="name" required />
 
     <label for="phone">聯絡電話</label>
     <input type="tel" id="phone" name="phone" required />
 
-    <label for="dateRange">租借日期（起始日 ~ 結束日）</label>
-    <input type="text" id="dateRange" name="dateRange" required placeholder="請選擇日期區間" />
+    <label for="startDate">租借起始日</label>
+    <input type="text" id="startDate" name="startDate" required readonly />
+
+    <label for="days">租借天數</label>
+    <select id="days" name="days" required>
+      <option value="">請選擇</option>
+      <option value="1">1 天</option>
+      <option value="2">2 天</option>
+      <option value="3">3 天</option>
+      <option value="4">4 天</option>
+      <option value="5">5 天以上</option>
+    </select>
 
     <label for="model">租借設備</label>
     <select id="model" name="model">
-      <option>S23 Ultra 黑</option>
+      <option>S23 Ultra 墨竹綠</option>
     </select>
 
     <div class="checkbox-group">
@@ -112,20 +127,59 @@
     <button type="submit">送出預約</button>
   </form>
 
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    flatpickr("#dateRange", {
-      mode: "range",
-      dateFormat: "Y-m-d",
-      minDate: "today",
-      disable: [
-        // 這裡可以放不可租借日期（未來串接 Google Sheets 抓已租日）
-        "2025-08-18", "2025-08-19", "2025-08-25"
-      ],
-      locale: {
-        firstDayOfWeek: 1
+    // 替換成你自己的 Apps Script 網址
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzG5uBclXUVjO2QeBw-tWchrd34fJIzNrnd8IdvcQSayuVOCXnzkbe6edfH_DRAAxBl/exec';
+
+    // 初始已被預約的日期
+    let reservedDates = [];
+
+    // 載入時從 API 讀取已預約日
+    async function fetchReservedDates() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        reservedDates = data.map(row => row.startDate);
+        initDatePicker();
+      } catch (err) {
+        alert('無法讀取已預約日，請稍後再試');
+        console.error(err);
+      }
+    }
+
+    // 初始化日期選擇器，disable 已預約日
+    function initDatePicker() {
+      flatpickr("#startDate", {
+        dateFormat: "Y-m-d",
+        disable: reservedDates,
+        minDate: "today"
+      });
+    }
+
+    // 表單送出
+    document.getElementById("rentalForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          mode: "no-cors", // 如果你有設 Apps Script CORS，可以改為 'cors'
+          body: new URLSearchParams(data),
+        });
+
+        alert("✅ 預約已送出！");
+        this.reset();
+      } catch (err) {
+        alert("❌ 預約失敗，請稍後再試");
+        console.error(err);
       }
     });
+
+    // 開始載入預約日
+    fetchReservedDates();
   </script>
 </body>
 </html>
