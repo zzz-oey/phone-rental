@@ -104,50 +104,66 @@
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-  const disabledDates = []; // 未來可串接後端拉資料填入
-  const fp = flatpickr("#range", {
-    mode: "range",
-    minDate: "today",
-    dateFormat: "Y-m-d",
-    disable: disabledDates,
-    onChange: function(selectedDates) {
-      const summary = document.getElementById('summaryText');
-      if (selectedDates.length === 2) {
-        const start = selectedDates[0].toLocaleDateString();
-        const end = selectedDates[1].toLocaleDateString();
-        summary.textContent = `📦 預計領取：${start}，歸還：${end}`;
-      } else {
-        summary.textContent = "📆 尚未選擇完整區間";
+  async function fetchReservedDates() {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbxNBeTng-gU9frn-zMDXJUVfnytCalCSk1W7xLZXzJ63dmtH6A2gN7b9m1HrinPrd1q/exec");
+    const data = await res.json();
+
+    const disabled = [];
+    data.forEach(range => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      while (start <= end) {
+        disabled.push(start.toISOString().split("T")[0]);
+        start.setDate(start.getDate() + 1);
       }
-    }
-  });
-
-  const form = document.getElementById("bookingForm");
-  form.addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const formData = {
-      name: form.name.value,
-      range: form.range.value,
-      location: form.location.value,
-      needCharger: form.needCharger.checked ? "需要" : "不需要",
-      note: form.note.value
-    };
-
-    fetch("https://script.google.com/macros/s/AKfycbzG5uBclXUVjO2QeBw-tWchrd34fJIzNrnd8IdvcQSayuVOCXnzkbe6edfH_DRAAxBl/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(formData)
     });
 
-    alert("已送出預約！我們會盡快與您聯繫！");
-    form.reset();
-    document.getElementById("summaryText").textContent = "📆 尚未選擇日期";
-    fp.clear();
-  });
+    const fp = flatpickr("#range", {
+      mode: "range",
+      minDate: "today",
+      dateFormat: "Y-m-d",
+      disable: disabled,
+      onChange: function(selectedDates) {
+        const summary = document.getElementById('summaryText');
+        if (selectedDates.length === 2) {
+          const start = selectedDates[0].toLocaleDateString();
+          const end = selectedDates[1].toLocaleDateString();
+          summary.textContent = `📦 預計領取：${start}，歸還：${end}`;
+        } else {
+          summary.textContent = "📆 尚未選擇完整區間";
+        }
+      }
+    });
+
+    const form = document.getElementById("bookingForm");
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const formData = {
+        name: form.name.value,
+        range: form.range.value,
+        location: form.location.value,
+        needCharger: form.needCharger.checked ? "需要" : "不需要",
+        note: form.note.value
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbzG5uBclXUVjO2QeBw-tWchrd34fJIzNrnd8IdvcQSayuVOCXnzkbe6edfH_DRAAxBl/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      alert("已送出預約！我們會盡快與您聯繫！");
+      form.reset();
+      document.getElementById("summaryText").textContent = "📆 尚未選擇日期";
+      fp.clear();
+    });
+  }
+
+  fetchReservedDates();
 </script>
 
 </body>
