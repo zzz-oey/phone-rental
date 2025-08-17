@@ -1,1 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>手機租借預約</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <style>
+    :root{
+      --bg:#f7f7f9; --card:#fff; --text:#111; --muted:#667; --accent:#0a58ff;
+      --border:#e6e6ef; --radius:12px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,"PingFang TC","Noto Sans TC",system-ui,sans-serif;
+      background:var(--bg); color:var(--text); margin:0; padding:28px}
+    .container{max-width:720px; margin-inline:auto; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px 20px 28px}
+    h1{margin:0 0 18px; text-align:center; font-size:24px}
+    .row{margin-top:16px}
+    label{font-weight:700; display:block; margin-bottom:8px}
+    .control{width:100%; border:1px solid var(--border); border-radius:10px; padding:12px; font-size:16px; background:#fff}
+    textarea.control{min-height:100px; resize:vertical}
+    .grid{display:grid; gap:12px}
+    @media (min-width:640px){ .grid-2{grid-template-columns:1fr 1fr} }
+    .hint{font-size:13px; color:var(--muted); margin-top:6px}
+    .summary{margin-top:10px; border:1px solid #dfe7ff; background:#eef3ff; color:#173b8e; border-radius:10px; padding:12px; line-height:1.7}
+    .summary b{font-weight:800}
+    .price{margin-top:10px; border:1px dashed #ccc; background:#fafafa; border-radius:10px; padding:12px; color:#333}
+    .actions{margin-top:22px}
+    button{width:100%; padding:14px 18px; border:none; color:#fff; background:var(--accent); border-radius:12px; font-size:16px; cursor:pointer}
+    button[disabled]{opacity:.65; cursor:not-allowed}
+    .checkbox{display:flex; align-items:center; gap:10px}
+    .checkbox input{width:18px; height:18px; margin:0; accent-color:var(--accent)}
+    .req{color:#d00; font-weight:700; margin-left:6px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📱 手機租借預約</h1>
 
+    <form id="rentalForm" novalidate autocomplete="off">
+      <!-- 姓名 / 電話 -->
+      <div class="grid grid-2">
+        <div class="row">
+          <label>姓名 <span class="req">（必填）</span></label>
+          <input class="control" type="text" name="name" required>
+        </div>
+        <div class="row">
+          <label>電話 <span class="req">（必填）</span></label>
+          <input class="control" type="tel" name="phone" required pattern="^[0-9 +()\\-]{6,}$" placeholder="09xx… 或可含 + - ( ) 空白">
+        </div>
+      </div>
+
+      <!-- 租借日期（區間） -->
+      <div class="row">
+        <label>租借日期（區間） <span class="req">（必填）</span></label>
+        <input class="control" type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間">
+        <div id="dateSummary" class="summary" style="display:none"></div>
+      </div>
+
+      <!-- 設備 -->
+      <div class="row">
+        <label>租借設備 <span class="req">（必填）</span></label>
+        <select class="control" id="device" name="device" required>
+          <option value="" disabled selected>請選擇</option>
+          <option value="S23 Ultra 黑">S23 Ultra 黑</option>
+          <option value="iPhone 14 Pro">iPhone 14 Pro</option>
+          <option value="Z Flip 5">Z Flip 5</option>
+        </select>
+      </div>
+
+      <!-- 充電器 -->
+      <div class="row">
+        <label>加值配件</label>
+        <label class="checkbox">
+          <input type="checkbox" id="charger" name="charger">
+          <span>需要 Type-C 充電頭</span>
+        </label>
+        <div class="hint">（充電頭不加價；如需加價規則可再補）</div>
+      </div>
+
+      <!-- 付款幣別（新增） -->
+      <div class="row">
+        <label>付款幣別 <span class="req">（必選）</span></label>
+        <select class="control" id="currency" name="currency" required>
+          <option value="" disabled selected>請選擇</option>
+          <option value="TWD">台幣（TWD）</option>
+          <option value="KRW">韓幣（KRW）</option>
+        </select>
+        <!-- 預估金額顯示，移到幣別下方 -->
+        <div id="priceBox" class="price" style="display:none"></div>
+        <div class="hint">費率：台幣 1–2 天 $700／天、3–4 天 $650／天、5+ 天 $650／天；韓幣 1–2 天 ₩30,000／天、3–4 天 ₩32,000／天、5+ 天 ₩32,000／天。</div>
+      </div>
+
+      <!-- 聯絡方式（IG / LINE 分開） -->
+      <div class="grid grid-2">
+        <div class="row">
+          <label>IG 帳號</label>
+          <input class="control" type="text" name="ig" placeholder="選填">
+        </div>
+        <div class="row">
+          <label>LINE ID</label>
+          <input class="control" type="text" name="line" placeholder="選填">
+        </div>
+      </div>
+
+      <!-- 取機地點 -->
+      <div class="row">
+        <label>預計取機地點 <span class="req">（必填）</span></label>
+        <select class="control" name="pickup" required>
+          <option value="" disabled selected>請選擇</option>
+          <option>弘大</option>
+          <option>新村</option>
+          <option>合井</option>
+          <option>望遠</option>
+        </select>
+      </div>
+
+      <!-- 備註 -->
+      <div class="row">
+        <label>備註</label>
+        <textarea class="control" name="note" placeholder="其他需求可補充（選填）"></textarea>
+      </div>
+
+      <!-- 同意條款 -->
+      <div class="row checkbox">
+        <input type="checkbox" id="agree" name="agree" required>
+        <label for="agree" style="margin:0">我已閱讀並同意租借條款 <span class="req">（必勾）</span></label>
+      </div>
+
+      <!-- 送出 -->
+      <div class="actions">
+        <button id="submitBtn" type="submit">送出預約</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    // ====== 後端 API（填了就會抓不可預約日期 + 可送出）======
+    const ENDPOINT = ""; // 例：'https://script.google.com/macros/s/xxxx/exec'
+
+    // ====== 價格表（可針對機種分價）======
+    // 傳入天數回傳「每日價格」
+    const PRICE_TWD = {
+      "S23 Ultra 黑": d => d <= 2 ? 700 : (d <= 4 ? 650 : 650),
+      "iPhone 14 Pro": d => d <= 2 ? 700 : (d <= 4 ? 650 : 650),
+      "Z Flip 5":     d => d <= 2 ? 700 : (d <= 4 ? 650 : 650),
+      "_default":     d => d <= 2 ? 700 : (d <= 4 ? 650 : 650)
+    };
+    const PRICE_KRW = {
+      "S23 Ultra 黑": d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000),
+      "iPhone 14 Pro": d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000),
+      "Z Flip 5":     d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000),
+      "_default":     d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000)
+    };
+
+    // ====== 工具 ======
+    const $ = s => document.querySelector(s);
+    const weekday = ["日","一","二","三","四","五","六"];
+    const toYMD = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const toHuman = d => `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${weekday[d.getDay()]}）`;
+
+    const dateSummary = $("#dateSummary");
+    const priceBox = $("#priceBox");
+
+    let selectedDays = 0;
+
+    // ====== 取得 & 處理不可預約日期 ======
+    function expandRangesToDates(ranges){
+      // 將 [{start,end}] 轉為 ["yyyy-mm-dd", ...]
+      const out = [];
+      ranges.forEach(r=>{
+        const s = new Date(r.start), e = new Date(r.end);
+        const cur = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+        const last = new Date(e.getFullYear(), e.getMonth(), e.getDate());
+        while (cur <= last) {
+          out.push(toYMD(cur));
+          cur.setDate(cur.getDate()+1);
+        }
+      });
+      return out;
+    }
+
+    let disabledDates = []; // ["yyyy-mm-dd", ...]
+    async function loadDisabledDates(){
+      if(!ENDPOINT) return; // 未填則略過
+      try{
+        const r = await fetch(`${ENDPOINT}?action=reserved`, {cache:"no-store"});
+        const data = await r.json();
+        if(Array.isArray(data)){
+          // 可能是 [{start,end}, ...]
+          disabledDates = expandRangesToDates(data);
+        }else if (Array.isArray(data.dates)){
+          // 也支援 {dates: ["yyyy-mm-dd", ...]}
+          disabledDates = data.dates;
+        }
+        fp.set("disable", disabledDates);
+      }catch(err){
+        console.warn("無法載入不可預約日期：", err);
+      }
+    }
+
+    // ====== 日期選擇器 ======
+    const fp = flatpickr("#daterange", {
+      mode: "range",
+      minDate: "today",
+      dateFormat: "Y-m-d",
+      disable: disabledDates,
+      onReady(){ loadDisabledDates(); },
+      onChange(dates) {
+        if (dates.length === 2) {
+          const [s,e] = dates;
+          selectedDays = Math.round((e - s)/86400000) + 1;
+          dateSummary.style.display = "block";
+          dateSummary.innerHTML = `📦 領取日：<b>${toHuman(s)}</b><br>
+📦 還機日：<b>${toHuman(e)}</b><br>
+⏰ 租借天數：<b>${selectedDays} 天</b>`;
+          updatePrice();
+        } else {
+          selectedDays = 0;
+          dateSummary.style.display = "none";
+          hidePrice();
+        }
+      }
+    });
+
+    // ====== 價格顯示（在幣別下方）======
+    function hidePrice(){
+      priceBox.style.display = "none";
+      priceBox.textContent = "";
+    }
+
+    function getDailyPrice(device, days, currency){
+      const table = currency === "KRW" ? PRICE_KRW : PRICE_TWD;
+      const fn = table[device] || table._default;
+      return fn(days);
+    }
+
+    function formatMoney(amount, currency){
+      if(currency === "KRW") return "₩" + Number(amount).toLocaleString("ko-KR");
+      return "NT$" + Number(amount).toLocaleString("zh-TW");
+    }
+
+    function updatePrice(){
+      const device = $("#device").value;
+      const currency = $("#currency").value;
+      if (!device || !selectedDays || !currency) return hidePrice();
+
+      const daily = getDailyPrice(device, selectedDays, currency);
+      const total = daily * selectedDays;
+
+      priceBox.style.display = "block";
+      priceBox.innerHTML = `
+        💰 <b>預估金額</b><br>
+        ‣ 機種：${device}<br>
+        ‣ 天數：${selectedDays} 天 × 每日 ${formatMoney(daily, currency)} = <b>${formatMoney(total, currency)}</b>
+      `;
+    }
+
+    $("#device").addEventListener("change", updatePrice);
+    $("#currency").addEventListener("change", updatePrice);
+
+    // ====== 表單送出（fetch JSON；未填 ENDPOINT 則僅示範）======
+    $("#rentalForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const f = e.target;
+      if (!f.reportValidity()) return;
+
+      if (!selectedDays) return alert("請先選擇完整的租借日期區間");
+      if (!$("#device").value) return alert("請選擇租借設備");
+      if (!$("#currency").value) return alert("請選擇付款幣別");
+
+      const btn = $("#submitBtn");
+      const txt = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "送出中…";
+
+      try{
+        const dates = fp.selectedDates;
+        const device = $("#device").value;
+        const currency = $("#currency").value;
+        const daily = getDailyPrice(device, selectedDays, currency);
+        const total = daily * selectedDays;
+
+        const payload = {
+          name: f.name.value.trim(),
+          phone: f.phone.value.trim(),
+          startDate: toYMD(dates[0]),
+          endDate: toYMD(dates[1]),
+          days: selectedDays,
+          device,
+          charger: $("#charger").checked ? "需要" : "不需要",
+          ig: f.ig.value.trim(),
+          line: f.line.value.trim(),
+          pickup: f.pickup.value,
+          note: f.note.value.trim(),
+          currency,
+          dailyPrice: daily,
+          totalPrice: total,
+          agree: $("#agree").checked ? "yes" : "",
+          timestamp: new Date().toISOString()
+        };
+
+        if (!ENDPOINT) {
+          alert("（示範）尚未串接後端，表單不會送出。之後把 ENDPOINT 換成你的 API 即可。");
+          console.log("payload", payload);
+          btn.disabled = false; btn.textContent = txt;
+          return;
+        }
+
+        const res = await fetch(ENDPOINT, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(()=>null);
+
+        if (res.ok && data && (data.status==="success" || data.ok===true)) {
+          location.href = "thanks.html";
+        } else {
+          const msg = (data && (data.message || data.error)) || `HTTP ${res.status}`;
+          location.href = `error.html?msg=${encodeURIComponent(msg)}`;
+        }
+      } catch(err){
+        location.href = `error.html?msg=${encodeURIComponent(err.message)}`;
+      } finally{
+        btn.disabled = false;
+        btn.textContent = txt;
+      }
+    });
+  </script>
+</body>
+</html>
