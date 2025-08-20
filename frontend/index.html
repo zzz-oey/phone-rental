@@ -89,7 +89,7 @@
     <div class="form-row">
       <label class="label" for="returnTime">預計還機時間（可不同於起算時間）</label>
       <input class="control" type="text" id="returnTime" name="returnTime" placeholder="預設與取機時間相同，可調整" autocomplete="off"/>
-      <div class="muted" style="margin-top:6px">若晚於起算時間，系統將依規則自動估算逾時費：2小時內按小時，2小時以上為半天，超過12小時為一天。</div>
+      <div class="muted" style="margin-top:6px">若晚於起算時間，系統將依規則自動估算逾時費：2小時內按小時，2小時以上為半天，超過8小時為一天。</div>
     </div>
 
     <!-- 租借日期/天數藍底資訊 -->
@@ -182,7 +182,7 @@
     <div class="hr"></div>
     <h3>【租借費用重點】</h3>
     <ul>
-      <li>計價以 24 小時為 1 天，自取機時間起算；逾時 2 小時內按小時計，2 小時以上半天，超過 12 小時算 1 天。</li>
+      <li>計價以 24 小時為 1 天，自取機時間起算；逾時 2 小時內按小時計，2 小時以上半天，超過 8 小時算 1 天。</li>
       <li>台幣：每小時 NT$100，上限 NT$700/日；半天 NT$350；一天 NT$700。</li>
       <li>韓幣：每小時 ₩4,000，上限 ₩32,000/日；半天 ₩16,000；一天 ₩32,000。</li>
     </ul>
@@ -395,7 +395,7 @@
         none: '無逾時',
         hourly: `2 小時內，按小時計（${currency==='KRW'?'₩4,000':'$100'}/小時）`,
         half: '超過 2 小時，以半天計',
-        day: '超過 12 小時，以 1 天計'
+        day: '超過 8 小時，以 1 天計'
       };
 
       priceSummary.innerHTML = `
