@@ -77,20 +77,19 @@
 
     <div class="form-row">
       <label class="label" for="phone">聯絡電話（必填）</label>
-      <!-- 僅允許 10 位數字；超過自動截斷 -->
+      <!-- 僅允許 11 位數字；超過自動截斷 -->
       <input
         class="control"
         type="tel"
         id="phone"
         name="phone"
         inputmode="numeric"
-        pattern="\\d{10}"
-        maxlength="10"
-        placeholder="請輸入 10 位數字"
+        pattern="\\d{11}"
+        maxlength="11"
+        placeholder="請輸入有效電話號碼"
         required
         autocomplete="off"
       />
-      <div class="muted" style="margin-top:6px">僅接受 10 位數字 </div>
     </div>
 
     <!-- 電子信箱（必填） + 動態網域下拉 -->
@@ -387,9 +386,9 @@
         }
       });
 
-      // 電話輸入：僅數字 + 最長 10 位
+      // 電話輸入：僅數字 + 最長 11 位
       $("phone").addEventListener("input", (e)=>{
-        const v = e.target.value.replace(/\D+/g,"").slice(0,10);
+        const v = e.target.value.replace(/\D+/g,"").slice(0,11);
         e.target.value = v;
       });
 
@@ -581,7 +580,7 @@
       const f=e.target;
 
       if(!f.name.value.trim()){ alert("請輸入姓名"); return; }
-      if(!/^\d{10}$/.test(f.phone.value.trim())){ alert("請輸入 10 位數字的聯絡電話"); return; }
+      if(!/^\d{11}$/.test(f.phone.value.trim())){ alert("請輸入 11 位數字的聯絡電話"); return; }
       if(!f.email.checkValidity()){ alert("請輸入有效的電子信箱"); return; }
       if(!$("event").value.trim()){ alert("請輸入活動名稱"); return; }
 
