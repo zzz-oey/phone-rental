@@ -6,329 +6,499 @@
   <title>手機租借預約</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <style>
-    :root{
-      --bg:#f7f7f9; --card:#fff; --text:#111; --muted:#667; --accent:#0a58ff;
-      --border:#e6e6ef; --radius:12px;
-    }
+    :root{ --gap:16px; --gap-lg:24px; --border:#dcdcdc; --text:#111; --muted:#666; --bg:#f7f7f7; --btn:#000; --btn2:#222; }
     *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,"PingFang TC","Noto Sans TC",system-ui,sans-serif;
-      background:var(--bg); color:var(--text); margin:0; padding:28px}
-    .container{max-width:720px; margin-inline:auto; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px 20px 28px}
-    h1{margin:0 0 18px; text-align:center; font-size:24px}
-    .row{margin-top:16px}
-    label{font-weight:700; display:block; margin-bottom:8px}
-    .control{width:100%; border:1px solid var(--border); border-radius:10px; padding:12px; font-size:16px; background:#fff}
-    textarea.control{min-height:100px; resize:vertical}
-    .grid{display:grid; gap:12px}
-    @media (min-width:640px){ .grid-2{grid-template-columns:1fr 1fr} }
-    .hint{font-size:13px; color:var(--muted); margin-top:6px}
-    .summary{margin-top:10px; border:1px solid #dfe7ff; background:#eef3ff; color:#173b8e; border-radius:10px; padding:12px; line-height:1.7}
-    .summary b{font-weight:800}
-    .price{margin-top:10px; border:1px dashed #ccc; background:#fafafa; border-radius:10px; padding:12px; color:#333}
-    .actions{margin-top:22px}
-    button{width:100%; padding:14px 18px; border:none; color:#fff; background:var(--accent); border-radius:12px; font-size:16px; cursor:pointer}
-    button[disabled]{opacity:.65; cursor:not-allowed}
-    .checkbox{display:flex; align-items:center; gap:10px}
-    .checkbox input{width:18px; height:18px; margin:0; accent-color:var(--accent)}
-    .req{color:#d00; font-weight:700; margin-left:6px}
+    body{ font-family:"Helvetica Neue", Arial, "PingFang TC","Noto Sans TC", system-ui, sans-serif;
+      color:var(--text); background:var(--bg); margin:0;
+      padding:clamp(16px,4vw,32px); max-width:780px; margin-inline:auto; }
+    h1{font-size:clamp(22px,4vw,28px); text-align:center; margin:0 0 var(--gap-lg)}
+    .form-row{margin-bottom:var(--gap-lg)}
+    .label{display:block; font-weight:700; margin-bottom:8px}
+    .muted{color:var(--muted); font-size:14px}
+
+    .control{
+      width:100%; display:block; padding:12px; font-size:16px; line-height:1.2;
+      border:1px solid var(--border); border-radius:8px; background:#fff; outline:none;
+      min-height:48px;
+    }
+    select.control{
+      height:48px; -webkit-appearance:none; appearance:none; padding-right:42px;
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat:no-repeat; background-position:right 12px center; background-size:16px 16px;
+    }
+    .control:focus{border-color:#999; box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+    textarea.control{min-height:110px; resize:vertical}
+
+    .checkbox{display:flex; align-items:flex-start; gap:10px}
+    .checkbox input{width:20px; height:20px; margin-top:3px; accent-color:#111}
+    .row-flex{display:flex; gap:8px; align-items:center}
+
+    .summary{
+      display:none; background:#eef3ff; border:1px solid #dbe3ff; color:#173b8e;
+      border-radius:8px; padding:12px; margin-top:-6px; margin-bottom:var(--gap-lg); line-height:1.6; font-size:16px;
+    }
+    .summary b{font-weight:700}
+    .req{ color:#d93025; font-weight:700; }
+
+    .actions{margin-top:28px}
+    button{
+      width:100%; padding:14px 18px; font-size:16px; border:none; border-radius:10px;
+      color:#fff; background:var(--btn); cursor:pointer;
+    }
+    button:hover{background:var(--btn2)}
+    button[disabled]{opacity:.6; cursor:not-allowed}
+
+    details.guide{
+      background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:28px;
+    }
+    details.guide summary{cursor:pointer; font-weight:800; font-size:18px; outline:none}
+    .guide h3{margin:16px 0 8px; font-size:16px}
+    .pill{ display:inline-block; padding:4px 8px; border:1px solid #e5e5e5; border-radius:999px; font-size:12px; color:#555; margin-right:6px; margin-top:6px; }
+    .hr{height:1px; background:#eee; margin:14px 0}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; background:#f3f3f3; padding:2px 6px; border-radius:6px}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📱 手機租借預約</h1>
+  <h1>手機租借預約</h1>
 
-    <form id="rentalForm" novalidate autocomplete="off">
-      <!-- 姓名 / 電話 -->
-      <div class="grid grid-2">
-        <div class="row">
-          <label>姓名 <span class="req">（必填）</span></label>
-          <input class="control" type="text" name="name" required>
-        </div>
-        <div class="row">
-          <label>電話 <span class="req">（必填）</span></label>
-          <input class="control" type="tel" name="phone" required pattern="^[0-9 +()\\-]{6,}$" placeholder="09xx… 或可含 + - ( ) 空白">
-        </div>
-      </div>
+  <form id="rental-form" novalidate autocomplete="off">
+    <div class="form-row">
+      <label class="label" for="name">姓名（必填）</label>
+      <input class="control" type="text" id="name" name="name" required autocomplete="off"/>
+    </div>
 
-      <!-- 租借日期（區間） -->
-      <div class="row">
-        <label>租借日期（區間） <span class="req">（必填）</span></label>
-        <input class="control" type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間">
-        <div id="dateSummary" class="summary" style="display:none"></div>
-      </div>
+    <div class="form-row">
+      <label class="label" for="phone">聯絡電話（必填）</label>
+      <input class="control" type="tel" id="phone" name="phone" required
+             pattern="^[0-9+()\\-\\s]{6,}$" placeholder="請輸入有效電話" autocomplete="off"/>
+    </div>
 
-      <!-- 設備 -->
-      <div class="row">
-        <label>租借設備 <span class="req">（必填）</span></label>
-        <select class="control" id="device" name="device" required>
-          <option value="" disabled selected>請選擇</option>
-          <option value="S23 Ultra 黑">S23 Ultra 黑</option>
-          <option value="iPhone 14 Pro">iPhone 14 Pro</option>
-          <option value="Z Flip 5">Z Flip 5</option>
+    <!-- 日期區間 + 起算時間 + 還機時間 -->
+    <div class="form-row">
+      <label class="label" for="daterange">租借日期區間（必填）</label>
+      <input class="control" type="text" id="daterange" name="daterange" required placeholder="請選擇日期區間（單日請將同一日期點兩次）" autocomplete="off"/>
+      <div class="muted" style="margin-top:6px">計費以 24 小時為 1 天，自下方<strong>取機時間</strong>起算。</div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="pickupTime">取機時間（起算時間，必填）</label>
+      <input class="control" type="text" id="pickupTime" name="pickupTime" required placeholder="例：20:00（24小時制）" autocomplete="off"/>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="returnTime">預計還機時間（可不同於起算時間）</label>
+      <input class="control" type="text" id="returnTime" name="returnTime" placeholder="預設與取機時間相同，可調整" autocomplete="off"/>
+      <div class="muted" style="margin-top:6px">若晚於起算時間，系統將依規則自動估算逾時費：2小時內按小時，2小時以上為半天，超過12小時為一天。</div>
+    </div>
+
+    <!-- 租借日期/天數藍底資訊 -->
+    <div id="summary" class="summary" aria-live="polite">
+      📦 領取：<b id="pickup-date"></b><br />
+      📦 歸還：<b id="return-date"></b><br />
+      ⏰ 租借天數（24h為一日）：<b id="rental-days"></b>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="model">租借設備（必填）</label>
+      <select class="control" id="model" name="model" required>
+        <option value="" disabled selected>請選擇</option>
+        <option value="S23 Ultra 黑 256G">Samsung Galaxy S23 Ultra 黑 256G（已貼保護貼）</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label class="label">加值配件</label>
+      <label class="checkbox" for="charger">
+        <input type="checkbox" id="charger" name="charger" />
+        <span>需要 Type-C 充電頭（免費借用，數量有限，請先勾選確保準備）</span>
+      </label>
+      <label class="checkbox" for="usba">
+        <input type="checkbox" id="usba" name="usba" />
+        <span>需要 USB-A ⇄ Type-C 線（可替換原 Type-C ⇄ Type-C）</span>
+      </label>
+    </div>
+
+    <!-- 付款幣別 -->
+    <div class="form-row">
+      <label class="label" for="currency">付款幣別（必填）</label>
+      <select class="control" id="currency" name="currency" required>
+        <option value="" disabled selected>請選擇幣別</option>
+        <option value="TWD">台幣</option>
+        <option value="KRW">韓幣</option>
+      </select>
+    </div>
+
+    <!-- 預估金額（藍底） -->
+    <div id="priceSummary" class="summary" aria-live="polite" style="display:none"></div>
+
+    <!-- 聯絡方式 -->
+    <div class="form-row">
+      <label class="label" for="contactType">聯絡方式（必填）</label>
+      <div class="row-flex">
+        <select id="contactType" name="contactType" class="control" style="flex:0.35" required>
+          <option value="" disabled selected>選擇方式</option>
+          <option value="IG">IG</option>
+          <option value="LINE">LINE</option>
         </select>
+        <input type="text" id="contactId" name="contactId" class="control" style="flex:0.65"
+               placeholder="請輸入帳號" required autocomplete="new-password"/>
       </div>
+    </div>
 
-      <!-- 充電器 -->
-      <div class="row">
-        <label>加值配件</label>
-        <label class="checkbox">
-          <input type="checkbox" id="charger" name="charger">
-          <span>需要 Type-C 充電頭</span>
-        </label>
-        <div class="hint">（充電頭不加價；如需加價規則可再補）</div>
-      </div>
+    <div class="form-row">
+      <label class="label" for="pickup">預計取機地點（必填）</label>
+      <select class="control" id="pickup" name="pickup" required>
+        <option value="" disabled selected>請選擇</option>
+        <option>弘大（홍대）</option>
+        <option>合井（합정）</option>
+        <option>上水（상수）</option>
+        <option>九老數碼園區（구로디지털단지）</option>
+        <option>其他（請在備註填寫）</option>
+      </select>
+    </div>
 
-      <!-- 付款幣別（新增） -->
-      <div class="row">
-        <label>付款幣別 <span class="req">（必選）</span></label>
-        <select class="control" id="currency" name="currency" required>
-          <option value="" disabled selected>請選擇</option>
-          <option value="TWD">台幣（TWD）</option>
-          <option value="KRW">韓幣（KRW）</option>
-        </select>
-        <!-- 預估金額顯示，移到幣別下方 -->
-        <div id="priceBox" class="price" style="display:none"></div>
-        <div class="hint">費率：台幣 1–2 天 $700／天、3–4 天 $650／天、5+ 天 $650／天；韓幣 1–2 天 ₩30,000／天、3–4 天 ₩32,000／天、5+ 天 ₩32,000／天。</div>
-      </div>
+    <div class="form-row">
+      <label class="label" for="note">備註</label>
+      <textarea class="control" id="note" name="note" placeholder="若需不同歸還日期/時間、特殊需求（Water Bomb/長時拍攝）、或其他地點，請在此補充" autocomplete="off"></textarea>
+    </div>
 
-      <!-- 聯絡方式（IG / LINE 分開） -->
-      <div class="grid grid-2">
-        <div class="row">
-          <label>IG 帳號</label>
-          <input class="control" type="text" name="ig" placeholder="選填">
-        </div>
-        <div class="row">
-          <label>LINE ID</label>
-          <input class="control" type="text" name="line" placeholder="選填">
-        </div>
-      </div>
+    <div class="form-row">
+      <label class="checkbox" for="agree">
+        <input type="checkbox" id="agree" name="agree" required />
+        <span>我已閱讀並同意<a href="#guide" class="kbd">租借指南</a>（必填）</span>
+      </label>
+      <div class="muted">送出代表同意租借、押金、逾時與賠償相關規範。</div>
+    </div>
 
-      <!-- 取機地點 -->
-      <div class="row">
-        <label>預計取機地點 <span class="req">（必填）</span></label>
-        <select class="control" name="pickup" required>
-          <option value="" disabled selected>請選擇</option>
-          <option>弘大</option>
-          <option>新村</option>
-          <option>合井</option>
-          <option>望遠</option>
-        </select>
-      </div>
+    <div class="actions">
+      <button id="submitBtn" type="submit">送出預約</button>
+    </div>
+  </form>
 
-      <!-- 備註 -->
-      <div class="row">
-        <label>備註</label>
-        <textarea class="control" name="note" placeholder="其他需求可補充（選填）"></textarea>
-      </div>
-
-      <!-- 同意條款 -->
-      <div class="row checkbox">
-        <input type="checkbox" id="agree" name="agree" required>
-        <label for="agree" style="margin:0">我已閱讀並同意租借條款 <span class="req">（必勾）</span></label>
-      </div>
-
-      <!-- 送出 -->
-      <div class="actions">
-        <button id="submitBtn" type="submit">送出預約</button>
-      </div>
-    </form>
-  </div>
+  <!-- 可展開的完整租借指南（略） -->
+  <details id="guide" class="guide">
+    <summary>📘 租借指南（點擊展開/收合）</summary>
+    <div class="hr"></div>
+    <h3>【租借費用重點】</h3>
+    <ul>
+      <li>計價以 24 小時為 1 天，自取機時間起算；逾時 2 小時內按小時計，2 小時以上半天，超過 12 小時算 1 天。</li>
+      <li>台幣：每小時 NT$100，上限 NT$700/日；半天 NT$350；一天 NT$700。</li>
+      <li>韓幣：每小時 ₩4,000，上限 ₩32,000/日；半天 ₩16,000；一天 ₩32,000。</li>
+    </ul>
+    <!-- 其餘條款可放你原文（略） -->
+  </details>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    // ====== 後端 API（填了就會抓不可預約日期 + 可送出）======
-    const ENDPOINT = ""; // 例：'https://script.google.com/macros/s/xxxx/exec'
+    // ★ Apps Script 端點
+    const API_BASE = "https://script.google.com/macros/s/AKfycbw96IKgRxbRIXhsHbaYArxV2jKJYTEcJh2EDp23To3x9mh38yXU_zocA7rCP-X-cH8O/exec";
 
-    // ====== 價格表（可針對機種分價）======
-    // 傳入天數回傳「每日價格」
-    const PRICE_TWD = {
-      "S23 Ultra 黑": d => d <= 2 ? 700 : (d <= 4 ? 650 : 650),
-      "iPhone 14 Pro": d => d <= 2 ? 700 : (d <= 4 ? 650 : 650),
-      "Z Flip 5":     d => d <= 2 ? 700 : (d <= 4 ? 650 : 650),
-      "_default":     d => d <= 2 ? 700 : (d <= 4 ? 650 : 650)
+    const $ = (id)=>document.getElementById(id);
+    const summary = $("summary");
+    const pickupEl = $("pickup-date");
+    const returnEl = $("return-date");
+    const daysEl = $("rental-days");
+    const priceSummary = $("priceSummary");
+
+    function depositOf(currency){ return currency === 'KRW' ? 120000 : 3000; }
+    function currencySign(currency){ return currency === 'KRW' ? '₩' : '$'; }
+    function fmt(currency, n){ return currencySign(currency) + Number(n).toLocaleString(); }
+
+    // 日租分級
+    function unitPrice(currency, days){
+      if (currency === 'TWD') {
+        if (days >= 5) return 600;
+        if (days <= 2) return 700;
+        return 650;
+      }
+      if (currency === 'KRW') {
+        if (days >= 5) return 28000;
+        if (days <= 2) return 32000;
+        return 30000;
+      }
+      return 0;
+    }
+
+    // 逾時規則（以你的公告為準；一天金額作為逾時「一天」費用與上限）
+    const Overage = {
+      TWD: { perHour: 100, halfDay: 350, perDay: 700 },
+      KRW: { perHour: 4000, halfDay: 16000, perDay: 32000 }
     };
-    const PRICE_KRW = {
-      "S23 Ultra 黑": d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000),
-      "iPhone 14 Pro": d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000),
-      "Z Flip 5":     d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000),
-      "_default":     d => d <= 2 ? 30000 : (d <= 4 ? 32000 : 32000)
-    };
 
-    // ====== 工具 ======
-    const $ = s => document.querySelector(s);
-    const weekday = ["日","一","二","三","四","五","六"];
-    const toYMD = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    const toHuman = d => `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${weekday[d.getDay()]}）`;
+    (function tintRequired(){
+      document.querySelectorAll('label,.label,h1,h2,h3,h4').forEach(el=>{
+        el.innerHTML = el.innerHTML.replace(/（必填）/g,'<span class="req">（必填）</span>');
+      });
+    })();
 
-    const dateSummary = $("#dateSummary");
-    const priceBox = $("#priceBox");
+    function toYMDLocal(d){
+      const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    }
+    function getWeekday(d){return ['日','一','二','三','四','五','六'][d.getDay()]}
 
-    let selectedDays = 0;
+    // 依「取機時間」計算 24h 為一日的天數（ceil）
+    function daysBy24h(startDate, endDate, pickupTime) {
+      const [hh, mm] = pickupTime.split(':').map(Number);
+      const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), hh, mm || 0, 0);
+      const end   = new Date(endDate.getFullYear(),   endDate.getMonth(),   endDate.getDate(),   hh, mm || 0, 0);
+      const ms = end - start;
+      if (ms <= 0) return { days: 0, startDT: start, endDT: end };
+      const days = Math.ceil(ms / 86400000); // 24h 為一日
+      return { days, startDT: start, endDT: end };
+    }
 
-    // ====== 取得 & 處理不可預約日期 ======
-    function expandRangesToDates(ranges){
-      // 將 [{start,end}] 轉為 ["yyyy-mm-dd", ...]
-      const out = [];
-      ranges.forEach(r=>{
-        const s = new Date(r.start), e = new Date(r.end);
-        const cur = new Date(s.getFullYear(), s.getMonth(), s.getDate());
-        const last = new Date(e.getFullYear(), e.getMonth(), e.getDate());
-        while (cur <= last) {
-          out.push(toYMD(cur));
-          cur.setDate(cur.getDate()+1);
+    // 超時費用估算：以「還機日」的還機時間 vs 規劃的結束時間（同一時刻）
+    function calcOverage(currency, plannedEndDT, returnTimeStr){
+      if (!returnTimeStr) return { hours:0, fee:0, rule:'none' };
+      const [rh, rm] = returnTimeStr.split(':').map(Number);
+      const actual = new Date(plannedEndDT.getFullYear(), plannedEndDT.getMonth(), plannedEndDT.getDate(), rh, rm || 0, 0);
+      const diffMs = actual - plannedEndDT;
+      if (diffMs <= 0) return { hours:0, fee:0, rule:'none' };
+
+      // 向上取整到整小時
+      const hours = Math.ceil(diffMs / 3600000);
+      const cfg = Overage[currency] || Overage.TWD;
+
+      if (hours <= 2){
+        const fee = Math.min(hours * cfg.perHour, cfg.perDay); // 理論上不會超過，但保險
+        return { hours, fee, rule:'hourly' };
+      } else if (hours > 2 && hours <= 12){
+        return { hours, fee: cfg.halfDay, rule:'half' };
+      } else { // > 12h
+        return { hours, fee: cfg.perDay, rule:'day' };
+      }
+    }
+
+    let disabledSet = new Set();
+
+    async function init() {
+      let disabledRanges = [];
+      try{
+        const r = await fetch(API_BASE + "?action=reserved", { cache: "no-store" });
+        const ranges = await r.json();
+        if (Array.isArray(ranges)) {
+          disabledRanges = ranges.map(x => ({ from: x.start, to: x.end }));
+          ranges.forEach(({start,end})=>{
+            const s = new Date(start), e = new Date(end);
+            const cur = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+            const last = new Date(e.getFullYear(), e.getMonth(), e.getDate());
+            while (cur <= last) {
+              disabledSet.add(toYMDLocal(cur));
+              cur.setDate(cur.getDate()+1);
+            }
+          });
+        }
+      }catch(err){ console.warn("取得預約區間失敗：", err); }
+
+      flatpickr("#daterange", {
+        mode:"range",
+        minDate:"today",
+        dateFormat:"Y-m-d",
+        disable: disabledRanges,
+        onChange: updateSummaries
+      });
+
+      // 取機時間（24h）
+      flatpickr("#pickupTime", {
+        enableTime:true,
+        noCalendar:true,
+        time_24hr:true,
+        dateFormat:"H:i",
+        defaultHour: 20,
+        defaultMinute: 0,
+        onChange: () => {
+          // 若未手動設定還機時間，讓它跟著起算時間走
+          const rt = $("returnTime")._flatpickr;
+          if (rt && !rt._manuallyChanged){
+            rt.setDate($("pickupTime").value, true);
+          }
+          updateSummaries();
         }
       });
-      return out;
+
+      // 還機時間（可不同於起算時間）
+      const rtPicker = flatpickr("#returnTime", {
+        enableTime:true,
+        noCalendar:true,
+        time_24hr:true,
+        dateFormat:"H:i",
+        onOpen: () => { rtPicker._opened = true; },
+        onChange: () => { rtPicker._manuallyChanged = true; updateSummaries(); }
+      });
+
+      // 預設把還機時間設為與取機時間相同
+      setTimeout(()=>{ 
+        const pt = $("pickupTime").value || "20:00";
+        rtPicker.setDate(pt, true);
+      }, 0);
+
+      ["model","currency","charger","usba","contactType","contactId","pickup","note"].forEach(id=>{
+        const el = $(id); if(el) el.addEventListener('change', updatePrice);
+      });
+
+      document.getElementById("rental-form").addEventListener("submit", onSubmit);
     }
 
-    let disabledDates = []; // ["yyyy-mm-dd", ...]
-    async function loadDisabledDates(){
-      if(!ENDPOINT) return; // 未填則略過
-      try{
-        const r = await fetch(`${ENDPOINT}?action=reserved`, {cache:"no-store"});
-        const data = await r.json();
-        if(Array.isArray(data)){
-          // 可能是 [{start,end}, ...]
-          disabledDates = expandRangesToDates(data);
-        }else if (Array.isArray(data.dates)){
-          // 也支援 {dates: ["yyyy-mm-dd", ...]}
-          disabledDates = data.dates;
-        }
-        fp.set("disable", disabledDates);
-      }catch(err){
-        console.warn("無法載入不可預約日期：", err);
+    function getSelectedDates(){
+      const fp = $("daterange")._flatpickr;
+      const sel = fp?.selectedDates || [];
+      return sel.length === 2 ? sel : null;
+    }
+
+    function updateSummaries(){
+      const sel = getSelectedDates();
+      const t = $("pickupTime").value;
+      if(!sel || !t){
+        document.getElementById("summary").style.display = "none";
+        priceSummary.style.display = "none";
+        priceSummary.innerHTML = "";
+        return;
       }
-    }
+      const [s, e] = sel;
+      const result = daysBy24h(s, e, t);
+      const d = result.days;
 
-    // ====== 日期選擇器 ======
-    const fp = flatpickr("#daterange", {
-      mode: "range",
-      minDate: "today",
-      dateFormat: "Y-m-d",
-      disable: disabledDates,
-      onReady(){ loadDisabledDates(); },
-      onChange(dates) {
-        if (dates.length === 2) {
-          const [s,e] = dates;
-          selectedDays = Math.round((e - s)/86400000) + 1;
-          dateSummary.style.display = "block";
-          dateSummary.innerHTML = `📦 領取日：<b>${toHuman(s)}</b><br>
-📦 還機日：<b>${toHuman(e)}</b><br>
-⏰ 租借天數：<b>${selectedDays} 天</b>`;
-          updatePrice();
-        } else {
-          selectedDays = 0;
-          dateSummary.style.display = "none";
-          hidePrice();
-        }
-      }
-    });
-
-    // ====== 價格顯示（在幣別下方）======
-    function hidePrice(){
-      priceBox.style.display = "none";
-      priceBox.textContent = "";
-    }
-
-    function getDailyPrice(device, days, currency){
-      const table = currency === "KRW" ? PRICE_KRW : PRICE_TWD;
-      const fn = table[device] || table._default;
-      return fn(days);
-    }
-
-    function formatMoney(amount, currency){
-      if(currency === "KRW") return "₩" + Number(amount).toLocaleString("ko-KR");
-      return "NT$" + Number(amount).toLocaleString("zh-TW");
+      document.getElementById("summary").style.display = "block";
+      pickupEl.textContent = `${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()} ${t}（${getWeekday(s)}）`;
+      // 顯示「還機日 + 預計還機時間」
+      const returnTime = $("returnTime").value || t;
+      returnEl.textContent = `${e.getFullYear()}/${e.getMonth()+1}/${e.getDate()} ${returnTime}（${getWeekday(e)}）`;
+      daysEl.textContent = d > 0 ? `${d} 天` : "—";
+      updatePrice();
     }
 
     function updatePrice(){
-      const device = $("#device").value;
-      const currency = $("#currency").value;
-      if (!device || !selectedDays || !currency) return hidePrice();
+      const model = $("model").value;
+      const currency = $("currency").value;
+      const sel = getSelectedDates();
+      const t = $("pickupTime").value;
+      if(!model || !currency || !sel || !t){
+        priceSummary.style.display='none'; priceSummary.innerHTML=''; return;
+      }
+      const [s,e] = sel;
+      const { days, endDT } = daysBy24h(s, e, t);
+      if (days <= 0){ priceSummary.style.display='none'; return; }
 
-      const daily = getDailyPrice(device, selectedDays, currency);
-      const total = daily * selectedDays;
+      const per = unitPrice(currency, days);
+      const rentTotal = per * days;
+      const deposit = depositOf(currency);
+      const grand = rentTotal + deposit;
 
-      priceBox.style.display = "block";
-      priceBox.innerHTML = `
-        💰 <b>預估金額</b><br>
-        ‣ 機種：${device}<br>
-        ‣ 天數：${selectedDays} 天 × 每日 ${formatMoney(daily, currency)} = <b>${formatMoney(total, currency)}</b>
+      // 超時估算
+      const returnTimeStr = $("returnTime").value || t;
+      const over = calcOverage(currency, endDT, returnTimeStr);
+
+      // 規則文字
+      const ruleMap = {
+        none: '無逾時',
+        hourly: `2 小時內，按小時計（${currency==='KRW'?'₩4,000':'$100'}/小時）`,
+        half: '超過 2 小時，以半天計',
+        day: '超過 12 小時，以 1 天計'
+      };
+
+      priceSummary.innerHTML = `
+        💰 租金總額：<b>${fmt(currency, rentTotal)}</b><br>
+        🔒 押金：<b>${fmt(currency, deposit)}</b><br>
+        📊 總額（租金+押金）：<b>${fmt(currency, grand)}</b><br>
+        （${days} 天 × 每日 <b>${fmt(currency, per)}</b>，以 <b>${t}</b> 起算 24h/日）<br>
+        <hr style="border:none;border-top:1px solid #dbe3ff; margin:10px 0;">
+        ⏰ 預估逾時費：<b>${fmt(currency, over.fee)}</b>　<span class="muted">（${ruleMap[over.rule]}；晚 <b>${over.hours}</b> 小時）</span><br>
+        <span class="muted">※ 逾時費僅供預估，實際於歸還當日依規定結算，不併入預付總額。</span>
       `;
+      priceSummary.style.display = 'block';
     }
 
-    $("#device").addEventListener("change", updatePrice);
-    $("#currency").addEventListener("change", updatePrice);
-
-    // ====== 表單送出（fetch JSON；未填 ENDPOINT 則僅示範）======
-    $("#rentalForm").addEventListener("submit", async (e)=>{
+    async function onSubmit(e){
       e.preventDefault();
       const f = e.target;
-      if (!f.reportValidity()) return;
 
-      if (!selectedDays) return alert("請先選擇完整的租借日期區間");
-      if (!$("#device").value) return alert("請選擇租借設備");
-      if (!$("#currency").value) return alert("請選擇付款幣別");
+      if(!f.name.value.trim()){ alert("請輸入姓名"); return; }
+      if(!f.phone.checkValidity()){ alert("請輸入有效電話（至少 6 碼，可含 + - ( ) 空白）"); return; }
+      const sel = getSelectedDates(); if(!sel){ alert("請選擇完整的租借日期區間！"); return; }
+      if(!$("pickupTime").value){ alert("請選擇取機時間（起算時間）"); return; }
+      if(!$("model").value){ alert("請選擇租借設備！"); return; }
+      if(!$("currency").value){ alert("請選擇付款幣別！"); return; }
+      if(!$("contactType").value){ alert("請選擇聯絡方式（IG/LINE）"); return; }
+      if(!$("contactId").value.trim()){ alert("請輸入聯絡帳號"); return; }
+      if(!$("pickup").value){ alert("請選擇取機地點"); return; }
+      if(!$("agree").checked){ alert("請先勾選並同意租借指南！"); return; }
 
-      const btn = $("#submitBtn");
-      const txt = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = "送出中…";
+      const [s,eDate] = sel;
+
+      // 檢查是否碰撞已預約日（以日期為單位）
+      let cur = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+      const last = new Date(eDate.getFullYear(), eDate.getMonth(), eDate.getDate());
+      while (cur <= last) {
+        if (disabledSet.has(toYMDLocal(cur))) { alert(`❌ 重複日期：${toYMDLocal(cur)} 已被預約，請改選其他日期。`); return; }
+        cur.setDate(cur.getDate()+1);
+      }
+
+      const pickupTime = $("pickupTime").value;
+      const returnTimeStr = $("returnTime").value || pickupTime;
+      const { days, startDT, endDT } = daysBy24h(s, eDate, pickupTime);
+      const currency = $("currency").value;
+      const per = unitPrice(currency, days);
+      const rentTotal = per * days;
+      const deposit = depositOf(currency);
+      const grand = rentTotal + deposit;
+
+      const over = calcOverage(currency, endDT, returnTimeStr);
+
+      const payload = {
+        name: f.name.value.trim(),
+        phone: f.phone.value.trim(),
+        startDate: toYMDLocal(s),
+        endDate: toYMDLocal(eDate),
+        pickupTime,
+        returnTime: returnTimeStr,
+        startISO: startDT.toISOString(),
+        plannedEndISO: endDT.toISOString(),
+        estimatedOverageHours: over.hours,
+        estimatedOverageFee: over.fee,
+        estimatedOverageRule: over.rule,
+        days: `${days} 天（24h/日制）`,
+        model: f.model.value,
+        charger: f.charger?.checked ? "需要" : "不需要",
+        usba: f.usba?.checked ? "需要" : "不需要",
+        contactType: $("contactType").value,
+        contactId: $("contactId").value.trim(),
+        pickup: f.pickup.value,
+        note: f.note.value.trim(),
+        currency,
+        dailyPrice: per,
+        rentTotal,
+        deposit,
+        grandTotal: grand,
+        agree: "yes",
+        timestamp: new Date().toISOString(),
+      };
+
+      const btn = $("submitBtn"); const txt = btn.textContent;
+      btn.disabled = true; btn.textContent = "送出中…";
 
       try{
-        const dates = fp.selectedDates;
-        const device = $("#device").value;
-        const currency = $("#currency").value;
-        const daily = getDailyPrice(device, selectedDays, currency);
-        const total = daily * selectedDays;
-
-        const payload = {
-          name: f.name.value.trim(),
-          phone: f.phone.value.trim(),
-          startDate: toYMD(dates[0]),
-          endDate: toYMD(dates[1]),
-          days: selectedDays,
-          device,
-          charger: $("#charger").checked ? "需要" : "不需要",
-          ig: f.ig.value.trim(),
-          line: f.line.value.trim(),
-          pickup: f.pickup.value,
-          note: f.note.value.trim(),
-          currency,
-          dailyPrice: daily,
-          totalPrice: total,
-          agree: $("#agree").checked ? "yes" : "",
-          timestamp: new Date().toISOString()
-        };
-
-        if (!ENDPOINT) {
-          alert("（示範）尚未串接後端，表單不會送出。之後把 ENDPOINT 換成你的 API 即可。");
-          console.log("payload", payload);
-          btn.disabled = false; btn.textContent = txt;
-          return;
-        }
-
-        const res = await fetch(ENDPOINT, {
+        const res = await fetch(API_BASE, {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
-
-        const data = await res.json().catch(()=>null);
-
-        if (res.ok && data && (data.status==="success" || data.ok===true)) {
-          location.href = "thanks.html";
-        } else {
-          const msg = (data && (data.message || data.error)) || `HTTP ${res.status}`;
-          location.href = `error.html?msg=${encodeURIComponent(msg)}`;
+        const text = await res.text();
+        let result; try{ result = JSON.parse(text); }catch{ alert("❌ 後端不是 JSON 回應：\n\n" + text.slice(0,500)); return; }
+        if(result && (result.success === true || result.status === "success")){
+          window.location.href = "thanks.html";
+        }else{
+          alert("❌ 預約失敗：" + ((result && (result.message || result.error)) || "未知錯誤"));
         }
-      } catch(err){
-        location.href = `error.html?msg=${encodeURIComponent(err.message)}`;
-      } finally{
-        btn.disabled = false;
-        btn.textContent = txt;
+      }catch(err){
+        alert("❌ 送出失敗：" + err.message);
+      }finally{
+        btn.disabled = false; btn.textContent = txt;
       }
-    });
+    }
+
+    init();
   </script>
 </body>
 </html>
