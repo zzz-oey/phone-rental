@@ -40,6 +40,12 @@
     }
     .summary b{font-weight:700}
     .req{ color:#d93025; font-weight:700; }
+    .red{ color:#d93025; font-weight:700; }
+
+    /* 連結樣式（租借指南） */
+    a.link{ color:#1a73e8; text-decoration:underline; }
+    a.link:hover{ color:#0b5ed7; }
+    a.link:visited, a.link.clicked{ color:#551A8B; } /* 點過會變色 */
 
     .actions{margin-top:28px}
     button{
@@ -49,14 +55,14 @@
     button:hover{background:var(--btn2)}
     button[disabled]{opacity:.6; cursor:not-allowed}
 
-    details.guide{
-      background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:28px;
-    }
-    details.guide summary{cursor:pointer; font-weight:800; font-size:18px; outline:none}
-    .guide h3{margin:16px 0 8px; font-size:16px}
-    .pill{ display:inline-block; padding:4px 8px; border:1px solid #e5e5e5; border-radius:999px; font-size:12px; color:#555; margin-right:6px; margin-top:6px; }
-    .hr{height:1px; background:#eee; margin:14px 0}
-    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; background:#f3f3f3; padding:2px 6px; border-radius:6px}
+    /* --- Guide Modal --- */
+    .modal{ display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.5); align-items:center; justify-content:center; }
+    .modal-content{ background:#fff; width:min(760px,92vw); max-height:82vh; display:flex; flex-direction:column; border-radius:12px; padding:20px; }
+    .guide-body{ line-height:1.7; font-size:15px; overflow:auto; max-height:calc(82vh - 64px); }
+    .guide-body h3{ margin:14px 0 8px; font-size:16px }
+    .guide-body ul{ padding-left:20px }
+    .guide-footer{ margin-top:12px; }
+    .close-bottom{ margin-top:12px; width:100%; }
   </style>
 </head>
 <body>
@@ -74,6 +80,26 @@
              pattern="^[0-9+()\\-\\s]{6,}$" placeholder="請輸入有效電話" autocomplete="off"/>
     </div>
 
+    <!-- 聯絡方式（移至電話下方） -->
+    <div class="form-row">
+      <label class="label" for="contactType">聯絡方式（必填）</label>
+      <div class="row-flex">
+        <select id="contactType" name="contactType" class="control" style="flex:0.35" required>
+          <option value="" disabled selected>選擇方式</option>
+          <option value="IG">IG</option>
+          <option value="LINE">LINE</option>
+        </select>
+        <input type="text" id="contactId" name="contactId" class="control" style="flex:0.65"
+               placeholder="請輸入帳號" required autocomplete="new-password"/>
+      </div>
+    </div>
+
+    <!-- 新增 活動名稱 -->
+    <div class="form-row">
+      <label class="label" for="event">活動名稱</label>
+      <input class="control" type="text" id="event" name="event" placeholder="例：Water Bomb / 演唱會 / 旅遊" autocomplete="off"/>
+    </div>
+
     <!-- 日期區間 + 起算時間 + 還機時間 -->
     <div class="form-row">
       <label class="label" for="daterange">租借日期區間（必填）</label>
@@ -82,14 +108,14 @@
     </div>
 
     <div class="form-row">
-      <label class="label" for="pickupTime">取機時間（起算時間，必填）</label>
+      <label class="label" for="pickupTime">取機時間 <span class="red">（起算時間，必填）</span></label>
       <input class="control" type="text" id="pickupTime" name="pickupTime" required placeholder="例：20:00（24小時制）" autocomplete="off"/>
     </div>
 
     <div class="form-row">
-      <label class="label" for="returnTime">預計還機時間（可不同於起算時間）</label>
+      <label class="label" for="returnTime">預計還機時間 <span class="red">（可不同於起算時間）</span></label>
       <input class="control" type="text" id="returnTime" name="returnTime" placeholder="預設與取機時間相同，可調整" autocomplete="off"/>
-      <div class="muted" style="margin-top:6px">若晚於起算時間，系統將依規則自動估算逾時費：2小時內按小時，2小時以上為半天，超過8小時為一天。</div>
+      <div class="muted" style="margin-top:6px">若晚於起算時間，系統將依規則自動估算逾時費：2小時內按小時，2小時以上為半天，<b>超過8小時為一天</b>。</div>
     </div>
 
     <!-- 租借日期/天數藍底資訊 -->
@@ -132,20 +158,6 @@
     <!-- 預估金額（藍底） -->
     <div id="priceSummary" class="summary" aria-live="polite" style="display:none"></div>
 
-    <!-- 聯絡方式 -->
-    <div class="form-row">
-      <label class="label" for="contactType">聯絡方式（必填）</label>
-      <div class="row-flex">
-        <select id="contactType" name="contactType" class="control" style="flex:0.35" required>
-          <option value="" disabled selected>選擇方式</option>
-          <option value="IG">IG</option>
-          <option value="LINE">LINE</option>
-        </select>
-        <input type="text" id="contactId" name="contactId" class="control" style="flex:0.65"
-               placeholder="請輸入帳號" required autocomplete="new-password"/>
-      </div>
-    </div>
-
     <div class="form-row">
       <label class="label" for="pickup">預計取機地點（必填）</label>
       <select class="control" id="pickup" name="pickup" required>
@@ -165,8 +177,8 @@
 
     <div class="form-row">
       <label class="checkbox" for="agree">
-        <input type="checkbox" id="agree" name="agree" required />
-        <span>我已閱讀並同意<a href="#guide" class="kbd">租借指南</a>（必填）</span>
+        <input type="checkbox" id="agree" name="agree" required disabled />
+        <span>我已閱讀並同意 <a href="#guide" id="guideLink" class="link">租借指南</a>（必填）</span>
       </label>
       <div class="muted">送出代表同意租借、押金、逾時與賠償相關規範。</div>
     </div>
@@ -176,18 +188,96 @@
     </div>
   </form>
 
-  <!-- 可展開的完整租借指南（略） -->
-  <details id="guide" class="guide">
-    <summary>📘 租借指南（點擊展開/收合）</summary>
-    <div class="hr"></div>
-    <h3>【租借費用重點】</h3>
-    <ul>
-      <li>計價以 24 小時為 1 天，自取機時間起算；逾時 2 小時內按小時計，2 小時以上半天，超過 8 小時算 1 天。</li>
-      <li>台幣：每小時 NT$100，上限 NT$700/日；半天 NT$350；一天 NT$700。</li>
-      <li>韓幣：每小時 ₩4,000，上限 ₩32,000/日；半天 ₩16,000；一天 ₩32,000。</li>
-    </ul>
-    <!-- 其餘條款可放你原文（略） -->
-  </details>
+  <!-- 租借指南彈窗 -->
+  <div id="guideModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-content">
+      <h2 id="guideTitle">S23U手機租借指南</h2>
+      <div id="guideScroll" class="guide-body">
+        <h3>【租借設備】</h3>
+        <ul>
+          <li>Samsung Galaxy S23 Ultra 黑 256G（已貼保護貼）</li>
+          <li>附手機殼、Type-C 對 Type-C 充電線（可事先告知是否需要充電頭或是否需要換成 USB 對 Type-C 充電線）</li>
+        </ul>
+
+        <h3>【租借費用】（台幣）</h3>
+        <ul>
+          <li>1–2天：NT$700/日</li>
+          <li>3–4天：NT$650/日</li>
+          <li>5天(含)以上：NT$600/日</li>
+          <li>訂金：NT$500</li>
+        </ul>
+        <p>👉 <b>以 24 小時為 1 天</b> 計算，自面交當天時間起算。</p>
+        <p>例1：8/1 20:00 取機 → 8/2 20:00 歸還 = 1 天<br>
+           例2：8/1 20:00 取機 → 8/5 20:00 歸還 = 4 天</p>
+        <p>⏰ 超時：每小時 NT$100，上限 NT$700/日。</p>
+        <ul>
+          <li>超時 2 小時以內 → 每小時 NT$100（或 KR₩4,000）。</li>
+          <li>超時 2 小時以上 → 以「半天」NT$350（或 KR₩16,000）計算。</li>
+          <li><b>超過 8 小時 → 以 1 天計算。</b></li>
+        </ul>
+
+        <h3>【租借費用】（韓幣）</h3>
+        <ul>
+          <li>1–2天：KR₩ 32,000/日</li>
+          <li>3–4天：KR₩ 30,000/日</li>
+          <li>5天(含)以上：KR₩ 28,000/日</li>
+          <li>訂金：KR₩ 20,000</li>
+        </ul>
+        <p>👉👉 <b>以 24 小時為 1 天</b> 計算，自面交當天時間起算。</p>
+        <p>例1：8/1 20:00 取機 → 8/2 20:00 歸還 = 1 天<br>
+           例2：8/1 20:00 取機 → 8/5 20:00 歸還 = 4 天</p>
+        <p>⏰ 超時：每小時 KR₩ 4,000，上限 KR₩ 32,000/日。</p>
+        <ul>
+          <li>超時 2 小時以內 → 每小時 KR₩4,000。</li>
+          <li>超時 2 小時以上 → 以「半天」 KR₩16,000 計算。</li>
+          <li><b>超過 8 小時 → 以 1 天計算。</b></li>
+        </ul>
+
+        <h3>【押金及證件】</h3>
+        <ul>
+          <li>押金 NT$3000（或 KRW 120,000）</li>
+          <li>本人有效證件正本（身分證、健保卡、駕照 擇一）</li>
+        </ul>
+        <ul>
+          <li>⚠️ 無證件抵押者，需繳更高額押金 NT$25,000（或 KRW 1,000,000）。</li>
+          <li>⚠️ 押金與證件會在歸還、檢查完畢後一併退還。</li>
+        </ul>
+
+        <h3>【預約流程】</h3>
+        <ol>
+          <li>確認欲租借日期（可提前 1–2 個月預約）</li>
+          <li>填寫基本資訊：姓名／電話／聯絡方式（IG/ LINE）／欲租借日期／活動名稱／面交地點</li>
+          <li>支付訂金 NT$500（保留手機，取消不退還）</li>
+          <li>面交時支付尾款＋押金＋本人有效證件正本</li>
+          <li>租借結束，檢查手機狀態 → 歸還押金與證件</li>
+        </ol>
+
+        <h3>【面交地點】</h3>
+        <ul>
+          <li>弘大 （홍대）／ 合井 （합정）／ 上水 （상수）／ 九老數碼園區 （구로디지털단지）</li>
+          <li>其餘地點須先與出租方協調</li>
+        </ul>
+
+        <h3>【租借注意事項】</h3>
+        <ol>
+          <li><b>承租資格</b>：承租人需年滿 18 歲，並以本人名義租借與使用，不得轉借、分租或供第三人使用。</li>
+          <li><b>資料清除與備份</b>：承租人須自行負責租借期間於設備上所產生或儲存的個人資料，並於歸還前完成備份與刪除；若因未清除或備份不足而導致資料外洩或遺失，出租方不承擔任何責任。</li>
+          <li><b>個資安全提醒</b>：承租時僅需提供本人有效證件正本，僅作為租借期間的抵押保障用，出租方不會另行複製或留存；手機歸還檢查完成後，會與押金一併返還。承租人應自行注意帳號安全，並於歸還前刪除個人資料。</li>
+          <li><b>設備檢查</b>：面交時雙方需確認手機外觀、功能，並可錄影或拍照存證。</li>
+          <li><b>使用限制</b>：不得隨意下載非必要或危險 App；若造成中毒或故障，承租人需負維修費。</li>
+          <li><b>賠償規範</b>：手機若遺失、損壞、刮傷或進水，需依 Samsung 原廠維修／換新報價賠償（含配件）。出租方可先行扣抵押金，若不足需由承租人補足。</li>
+          <li><b>電量檢查配合</b>：歸還時請盡量保留電量（20–30%），方便立即完成檢查；若電量不足導致無法當場檢測，可能需延後退還押金。</li>
+          <li><b>超時處理</b>：超時 2 小時以內，每小時收費 NT$100（KR₩4,000）；超過 2 小時以半天計算 NT$350（KR₩16,000）；<b>超過 8 小時以 1 天計算</b>。若因此影響後續租借安排，除訂金不予退還外，承租人並需額外賠償出租人因超時造成的租金損失。</li>
+          <li><b>租期規範</b>：租借以 24 小時為 1 日計算，訂金恕不退還。租借開始日一週內，若有<b>大幅更動（例如更改 2 天以上或整段時程）</b>，出租方得視情況自訂金中扣除 NT$200（KR₩8,000）作為協調與排程辛苦費，且不保證欲更改的日期區間一定能租借，將以首次預約時段為優先。</li>
+          <li><b>故障處理</b>：租借期間如發生異常或故障，承租人應立即通知出租方；若確認為人為因素，則需依照注意事項第 6 點賠償。</li>
+          <li><b>規則修正</b>：出租方保留調整租借規則與價格之權利，若有變更將提前公告並通知承租人。</li>
+          <li><b>使用提醒</b>：請妥善保管設備，避免不當操作或高風險環境使用，包括長時間曝曬、高溫環境或涉水情況。若有特殊需求（如 Water Bomb、戶外長時間拍攝等），請務必事先告知出租方，以利協調並保障雙方權益。</li>
+        </ol>
+      </div>
+      <button class="close-bottom" id="closeGuideBtn" type="button">關閉</button>
+      <div class="guide-footer muted">（已閱讀至底部後，將自動解鎖「同意」勾選）</div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
@@ -220,7 +310,7 @@
       return 0;
     }
 
-    // 逾時規則（以你的公告為準；一天金額作為逾時「一天」費用與上限）
+    // 逾時規則
     const Overage = {
       TWD: { perHour: 100, halfDay: 350, perDay: 700 },
       KRW: { perHour: 4000, halfDay: 16000, perDay: 32000 }
@@ -249,7 +339,7 @@
       return { days, startDT: start, endDT: end };
     }
 
-    // 超時費用估算：以「還機日」的還機時間 vs 規劃的結束時間（同一時刻）
+    // 超時費用估算
     function calcOverage(currency, plannedEndDT, returnTimeStr){
       if (!returnTimeStr) return { hours:0, fee:0, rule:'none' };
       const [rh, rm] = returnTimeStr.split(':').map(Number);
@@ -257,16 +347,15 @@
       const diffMs = actual - plannedEndDT;
       if (diffMs <= 0) return { hours:0, fee:0, rule:'none' };
 
-      // 向上取整到整小時
       const hours = Math.ceil(diffMs / 3600000);
       const cfg = Overage[currency] || Overage.TWD;
 
       if (hours <= 2){
-        const fee = Math.min(hours * cfg.perHour, cfg.perDay); // 理論上不會超過，但保險
+        const fee = Math.min(hours * cfg.perHour, cfg.perDay);
         return { hours, fee, rule:'hourly' };
-      } else if (hours > 2 && hours <= 12){
+      } else if (hours > 2 && hours <= 8){
         return { hours, fee: cfg.halfDay, rule:'half' };
-      } else { // > 12h
+      } else {
         return { hours, fee: cfg.perDay, rule:'day' };
       }
     }
@@ -292,16 +381,36 @@
         }
       }catch(err){ console.warn("取得預約區間失敗：", err); }
 
+      // 日期區間（強制最短 24h：如果同一天，會自動把結束日 +1 天）
       flatpickr("#daterange", {
         mode:"range",
         minDate:"today",
-        dateFormat:"Y-m-d",
+        allowInput:false,
+        dateFormat:"Y-m-d to Y-m-d",
         disable: disabledRanges,
-        onChange: updateSummaries
+        onChange: (dates, _str, instance) => {
+          if (dates.length === 1){
+            instance.input.value = ""; // 單選不顯示
+            hideSummaries();
+            return;
+          }
+          if (dates.length === 2){
+            const d0 = new Date(dates[0].getFullYear(), dates[0].getMonth(), dates[0].getDate());
+            const d1 = new Date(dates[1].getFullYear(), dates[1].getMonth(), dates[1].getDate());
+            if (d0.getTime() === d1.getTime()){
+              // 同一天 → 自動 +1 天，確保 24h 最短租期
+              const next = new Date(d0); next.setDate(d0.getDate()+1);
+              instance.setDate([d0, next], true);
+            } else {
+              instance.input.value = `${instance.formatDate(dates[0],"Y-m-d")} to ${instance.formatDate(dates[1],"Y-m-d")}`;
+              updateSummaries(); updatePrice();
+            }
+          }
+        }
       });
 
-      // 取機時間（24h）
-      flatpickr("#pickupTime", {
+      // 取機時間（直接填入 20:00）
+      const ptPicker = flatpickr("#pickupTime", {
         enableTime:true,
         noCalendar:true,
         time_24hr:true,
@@ -309,36 +418,47 @@
         defaultHour: 20,
         defaultMinute: 0,
         onChange: () => {
-          // 若未手動設定還機時間，讓它跟著起算時間走
           const rt = $("returnTime")._flatpickr;
           if (rt && !rt._manuallyChanged){
             rt.setDate($("pickupTime").value, true);
           }
-          updateSummaries();
+          updateSummaries(); updatePrice();
         }
       });
+      ptPicker.setDate("20:00", true);
 
-      // 還機時間（可不同於起算時間）
+      // 還機時間
       const rtPicker = flatpickr("#returnTime", {
         enableTime:true,
         noCalendar:true,
         time_24hr:true,
         dateFormat:"H:i",
         onOpen: () => { rtPicker._opened = true; },
-        onChange: () => { rtPicker._manuallyChanged = true; updateSummaries(); }
+        onChange: () => { rtPicker._manuallyChanged = true; updateSummaries(); updatePrice(); }
       });
+      rtPicker.setDate("20:00", true);
 
-      // 預設把還機時間設為與取機時間相同
-      setTimeout(()=>{ 
-        const pt = $("pickupTime").value || "20:00";
-        rtPicker.setDate(pt, true);
-      }, 0);
-
-      ["model","currency","charger","usba","contactType","contactId","pickup","note"].forEach(id=>{
-        const el = $(id); if(el) el.addEventListener('change', updatePrice);
+      // 價格影響欄位
+      ["model","currency","charger","usba","contactType","contactId","pickup","note","event"].forEach(id=>{
+        const el = $(id); if(el) el.addEventListener('change', ()=>{ updatePrice(); });
       });
 
       document.getElementById("rental-form").addEventListener("submit", onSubmit);
+
+      // Guide modal
+      const link = $("guideLink");
+      link.addEventListener("click", (e)=>{ e.preventDefault(); link.classList.add("clicked"); openGuide(); });
+      $("closeGuideBtn").addEventListener("click", ()=> closeGuide());
+      $("guideModal").addEventListener("click", (e)=>{ if(e.target.id==="guideModal") closeGuide(); });
+      $("guideScroll").addEventListener("scroll", onGuideScroll);
+
+      updateSummaries(); updatePrice();
+    }
+
+    function hideSummaries(){
+      document.getElementById("summary").style.display = "none";
+      priceSummary.style.display = "none";
+      priceSummary.innerHTML = "";
     }
 
     function getSelectedDates(){
@@ -350,33 +470,43 @@
     function updateSummaries(){
       const sel = getSelectedDates();
       const t = $("pickupTime").value;
-      if(!sel || !t){
-        document.getElementById("summary").style.display = "none";
-        priceSummary.style.display = "none";
-        priceSummary.innerHTML = "";
-        return;
-      }
+      if(!sel || !t){ hideSummaries(); return; }
       const [s, e] = sel;
       const result = daysBy24h(s, e, t);
       const d = result.days;
 
       document.getElementById("summary").style.display = "block";
       pickupEl.textContent = `${s.getFullYear()}/${s.getMonth()+1}/${s.getDate()} ${t}（${getWeekday(s)}）`;
-      // 顯示「還機日 + 預計還機時間」
       const returnTime = $("returnTime").value || t;
       returnEl.textContent = `${e.getFullYear()}/${e.getMonth()+1}/${e.getDate()} ${returnTime}（${getWeekday(e)}）`;
-      daysEl.textContent = d > 0 ? `${d} 天` : "—";
-      updatePrice();
+      daysEl.textContent = d > 0 ? `${d}天` : "—";  // 無空格：1天
     }
 
+    // 價格卡（含占位提示）
     function updatePrice(){
       const model = $("model").value;
       const currency = $("currency").value;
       const sel = getSelectedDates();
       const t = $("pickupTime").value;
-      if(!model || !currency || !sel || !t){
-        priceSummary.style.display='none'; priceSummary.innerHTML=''; return;
+
+      if(!currency){ priceSummary.style.display='none'; priceSummary.innerHTML=''; return; }
+
+      const missing = [];
+      if(!sel) missing.push('租借日期區間');
+      if(!t) missing.push('取機時間');
+      if(!model) missing.push('租借設備');
+
+      if(missing.length){
+        priceSummary.innerHTML = `
+          🔔 <b>請先完成以下項目以顯示試算：</b><br>
+          • ${missing.join('、')}<br>
+          <hr style="border:none;border-top:1px solid #dbe3ff; margin:10px 0;">
+          <span class="muted">※ 逾時規則：2 小時內按小時、2–8 小時半天、超過 8 小時一天。</span>
+        `;
+        priceSummary.style.display='block';
+        return;
       }
+
       const [s,e] = sel;
       const { days, endDT } = daysBy24h(s, e, t);
       if (days <= 0){ priceSummary.style.display='none'; return; }
@@ -386,11 +516,9 @@
       const deposit = depositOf(currency);
       const grand = rentTotal + deposit;
 
-      // 超時估算
       const returnTimeStr = $("returnTime").value || t;
       const over = calcOverage(currency, endDT, returnTimeStr);
 
-      // 規則文字
       const ruleMap = {
         none: '無逾時',
         hourly: `2 小時內，按小時計（${currency==='KRW'?'₩4,000':'$100'}/小時）`,
@@ -402,10 +530,11 @@
         💰 租金總額：<b>${fmt(currency, rentTotal)}</b><br>
         🔒 押金：<b>${fmt(currency, deposit)}</b><br>
         📊 總額（租金+押金）：<b>${fmt(currency, grand)}</b><br>
-        （${days} 天 × 每日 <b>${fmt(currency, per)}</b>，以 <b>${t}</b> 起算 24h/日）<br>
+        （${days}天 × 每日 <b>${fmt(currency, per)}</b>，以 <b>${t}</b> 起算 24h/日）<br>
         <hr style="border:none;border-top:1px solid #dbe3ff; margin:10px 0;">
         ⏰ 預估逾時費：<b>${fmt(currency, over.fee)}</b>　<span class="muted">（${ruleMap[over.rule]}；晚 <b>${over.hours}</b> 小時）</span><br>
-        <span class="muted">※ 逾時費僅供預估，實際於歸還當日依規定結算，不併入預付總額。</span>
+        <span class="muted">※ 逾時費僅供預估，實際於歸還當日依規定結算，不併入預付總額。</span><br>
+        <span class="muted">※ 逾時規則：2 小時內按小時、2–8 小時半天、超過 8 小時一天。</span>
       `;
       priceSummary.style.display = 'block';
     }
@@ -423,7 +552,7 @@
       if(!$("contactType").value){ alert("請選擇聯絡方式（IG/LINE）"); return; }
       if(!$("contactId").value.trim()){ alert("請輸入聯絡帳號"); return; }
       if(!$("pickup").value){ alert("請選擇取機地點"); return; }
-      if(!$("agree").checked){ alert("請先勾選並同意租借指南！"); return; }
+      if(!$("agree").checked){ alert("請先開啟並閱讀租借指南至底部，才能勾選同意！"); return; }
 
       const [s,eDate] = sel;
 
@@ -458,12 +587,13 @@
         estimatedOverageHours: over.hours,
         estimatedOverageFee: over.fee,
         estimatedOverageRule: over.rule,
-        days: `${days} 天（24h/日制）`,
+        days: `${days}天（24h/日制）`,   // 無空格
         model: f.model.value,
         charger: f.charger?.checked ? "需要" : "不需要",
         usba: f.usba?.checked ? "需要" : "不需要",
         contactType: $("contactType").value,
         contactId: $("contactId").value.trim(),
+        event: $("event").value.trim(),
         pickup: f.pickup.value,
         note: f.note.value.trim(),
         currency,
@@ -498,6 +628,25 @@
       }
     }
 
+    // ---- Guide Modal 行為 ----
+    function openGuide(){
+      $("guideModal").style.display = "flex";
+      const sc = $("guideScroll");
+      sc.scrollTop = 0;
+      $("agree").checked = false;
+      $("agree").disabled = true;
+    }
+    function closeGuide(){
+      $("guideModal").style.display = "none";
+    }
+    function onGuideScroll(){
+      const sc = $("guideScroll");
+      if (sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 8){
+        $("agree").disabled = false;
+      }
+    }
+
+    // 啟動
     init();
   </script>
 </body>
